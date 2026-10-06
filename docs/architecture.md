@@ -1,7 +1,12 @@
-# Architecture — Phase 0
+# Architecture
 
-This document records the initial architecture of Oscar 2.0 and every assumption made while
-setting it up. Anything not written here has **not** been decided yet.
+This document records the architecture of Oscar 2.0 and every assumption made while building it.
+Anything not written here has **not** been decided yet.
+
+| Phase | Scope                                    | Status   |
+| ----- | ---------------------------------------- | -------- |
+| 0     | Foundation: tooling, structure, docs     | Complete |
+| 1     | Design system and reusable UI foundation | Complete |
 
 ## 1. Goals of the foundation
 
@@ -30,6 +35,11 @@ setting it up. Anything not written here has **not** been decided yet.
 src/
 ├── app/          Routing layer only. Thin pages/layouts/route handlers that compose features.
 ├── components/   Shared, presentation-only components. No data access.
+│   ├── ui/       Design-system primitives (Button, Input, Dialog, ...) + index.ts
+│   ├── oscar/    Oscar identity (presence mark, status pattern, wordmark)
+│   ├── layout/   Layout primitives (Container)
+│   └── icons/    Inline SVG icon set
+├── styles/       Design tokens, typography roles, motion utilities (global CSS)
 ├── config/       Static, non-secret configuration (e.g. site name).
 ├── features/     Product domains. One folder per domain.
 ├── lib/          Pure, framework-agnostic utilities (e.g. env access).
@@ -48,7 +58,8 @@ app  ──▶  features  ──▶  components, lib, config, types
 
 - `app/` may import anything; nothing imports from `app/` (tests excepted).
 - `features/*` may import shared layers, never another feature's internals — only its `index.ts`.
-- `components/`, `lib/`, `config/`, `types/` never import from `features/` or `server/`.
+- `components/`, `lib/`, `config/`, `types/`, `styles/` never import from `features/` or `server/`.
+- Inside `components/`, `ui` may use `icons`; `oscar` and `layout` may use `ui`. `ui` never imports `oscar`.
 - `server/` is never imported by a client component.
 
 ### Planned modules (not built)
@@ -84,7 +95,7 @@ names or branding appear in user-facing code.
 | Types  | `tsc` (strict, `noUncheckedIndexedAccess`, `noImplicitOverride`, `noImplicitReturns`, `noFallthroughCasesInSwitch`)             | `npm run typecheck`    |
 | Lint   | ESLint 9 flat config: `next/core-web-vitals`, `next/typescript`, type-import consistency, no `any`, Prettier conflict rules off | `npm run lint`         |
 | Format | Prettier 3                                                                                                                      | `npm run format:check` |
-| Tests  | Vitest (Node environment)                                                                                                       | `npm run test`         |
+| Tests  | Vitest + Testing Library (jsdom for components, Node for server code); token contrast and design-rule guards                    | `npm run test`         |
 | Build  | `next build`                                                                                                                    | `npm run build`        |
 
 `npm run typecheck` runs `next typegen` first so the global route helper types (`PageProps`,
@@ -99,6 +110,5 @@ names or branding appear in user-facing code.
 
 ## 7. Deferred decisions
 
-Hosting/deployment target, CI provider, UI/styling system, component library, browser/E2E
-testing (e.g. Playwright), React component testing (e.g. Testing Library + jsdom), logging and
-error monitoring, i18n. Each is added when the phase that needs it begins, and recorded here.
+Hosting/deployment target, CI provider, browser/E2E testing (e.g. Playwright), automated
+accessibility checks in CI (axe), final logo and brand assets, logging and error monitoring, i18n. Each is added when the phase that needs it begins, and recorded here.

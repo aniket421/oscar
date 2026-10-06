@@ -35,30 +35,41 @@ These rules apply to every change in Oscar 2.0, by humans and AI agents alike.
 12. Use the `@/` alias for imports from `src/`.
 13. Default to React Server Components; add `"use client"` only where interactivity requires it.
 
+## UI and design system
+
+14. `docs/design-system.md` is the source of truth for UI. Read it before building any screen.
+15. Build screens from `src/components/ui` and `src/components/oscar`. Do not create a second
+    button, input, or card; extend the existing component if a real need appears.
+16. Use semantic tokens only. No raw colors, palette tokens, or arbitrary spacing outside
+    `src/styles/tokens.css` (enforced by tests).
+17. Follow the forbidden-pattern list in the design system: no fake data, no decorative gradients,
+    no pill buttons, no emoji icons, no AI-provider branding, no em dashes in product copy.
+18. Every new interactive component ships with keyboard and accessibility tests.
+
 ## TypeScript
 
-14. Strict mode stays on. Do not weaken `tsconfig.json` flags to make code compile.
-15. No `any`. Use `unknown` and narrow. No `@ts-ignore`; `@ts-expect-error` only with a comment
+19. Strict mode stays on. Do not weaken `tsconfig.json` flags to make code compile.
+20. No `any`. Use `unknown` and narrow. No `@ts-ignore`; `@ts-expect-error` only with a comment
     explaining why.
-16. Use `import type` for type-only imports.
+21. Use `import type` for type-only imports.
 
 ## Quality gates
 
-17. Before every commit/PR, `npm run check` must pass (typecheck, lint with zero warnings,
+22. Before every commit/PR, `npm run check` must pass (typecheck, lint with zero warnings,
     format check, tests, production build).
-18. New logic ships with unit tests. Bug fixes ship with a test that would have caught the bug.
-19. Never skip, disable, or delete a failing test to get green — fix the cause.
-20. Do not disable lint rules inline without a comment explaining why.
+23. New logic ships with unit tests. Bug fixes ship with a test that would have caught the bug.
+24. Never skip, disable, or delete a failing test to get green — fix the cause.
+25. Do not disable lint rules inline without a comment explaining why.
 
 ## Git
 
-21. Small, focused commits with descriptive messages in the imperative mood.
-22. Never commit generated output (`.next/`, `coverage/`, `node_modules/`, `*.tsbuildinfo`).
-23. Lockfile changes are committed together with the `package.json` change that caused them.
+26. Small, focused commits with descriptive messages in the imperative mood.
+27. Never commit generated output (`.next/`, `coverage/`, `node_modules/`, `*.tsbuildinfo`).
+28. Lockfile changes are committed together with the `package.json` change that caused them.
 
 ## Documentation
 
-24. Each phase has a QA checklist in `docs/qa/phase-N.md` that must be completed before the phase
+29. Each phase has a QA checklist in `docs/qa/phase-N.md` that must be completed before the phase
     is declared done.
-25. Update `README.md` and `docs/architecture.md` in the same change that alters setup, scripts,
+30. Update `README.md` and `docs/architecture.md` in the same change that alters setup, scripts,
     structure, or architecture.

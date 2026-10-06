@@ -1,0 +1,31 @@
+.spinner {
+  display: inline-block;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  opacity: 0.9;
+  animation: oscar-spin 700ms linear infinite;
+}
+
+.sm {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.md {
+  width: 1rem;
+  height: 1rem;
+}
+
+.lg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+/* Progress must stay perceivable, so slow down rather than stop. */
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 1600ms;
+  }
+}

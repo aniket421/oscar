@@ -1,0 +1,455 @@
+/* Layout styles for the development-only design system playground. */
+
+.page {
+  padding-bottom: var(--space-section);
+  background-color: var(--color-background);
+}
+
+.pageHeader {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  border-bottom: var(--border-width) solid var(--color-border);
+  background-color: var(--color-background);
+}
+
+.pageHeaderInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  height: var(--space-16);
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding-block: var(--space-12) var(--space-4);
+}
+
+.toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-small-size);
+}
+
+.toc a {
+  color: var(--color-foreground-muted);
+  text-decoration: none;
+  text-underline-offset: 0.2em;
+}
+
+.toc a:hover {
+  color: var(--color-foreground);
+  text-decoration: underline;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding-block: var(--space-12);
+  border-top: var(--border-width) solid var(--color-border);
+  scroll-margin-top: var(--space-20);
+}
+
+.sectionHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: var(--container-narrow);
+}
+
+.demo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.demoBody {
+  min-width: 0;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.stackTight {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.grow {
+  flex: 1;
+  min-width: 0;
+}
+
+.mtSmall {
+  margin-top: var(--space-2);
+}
+
+/* Identity */
+.presenceGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 640px) {
+  .presenceGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .presenceGrid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+.presenceItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.statusGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .statusGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Color */
+.swatchGroups {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-8);
+}
+
+@media (min-width: 768px) {
+  .swatchGroups {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.swatchGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.swatchList {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 480px) {
+  .swatchList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.swatch {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.swatchChip {
+  flex-shrink: 0;
+  width: var(--space-10);
+  height: var(--space-10);
+  border-radius: var(--radius-md);
+  box-shadow: inset 0 0 0 var(--border-width) var(--color-border);
+}
+
+/* Typography */
+.typeList {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.typeRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-2);
+  padding-block: var(--space-5);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+@media (min-width: 768px) {
+  .typeRow {
+    grid-template-columns: 10rem minmax(0, 1fr);
+    gap: var(--space-8);
+    align-items: baseline;
+  }
+}
+
+.typeRow dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+/* Spacing */
+.spaceList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.spaceRow {
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.spaceBar {
+  display: block;
+  height: var(--space-3);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-accent);
+}
+
+/* Radius and elevation */
+.tileGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 768px) {
+  .tileGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.tile {
+  display: grid;
+  place-items: end start;
+  height: 6rem;
+  padding: var(--space-3);
+  border: var(--border-width) solid var(--color-border);
+  background-color: var(--color-surface);
+}
+
+/* Motion */
+.motionGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .motionGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.motionTile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-background-subtle);
+}
+
+/* Forms */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+}
+
+@media (min-width: 768px) {
+  .formGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Cards */
+.cardGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .cardGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .cardGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.skeletonCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 28rem;
+  padding: var(--space-card);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+/* Dark surface */
+.darkPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-6);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--highlight-edge);
+}
+
+@media (min-width: 768px) {
+  .darkPanel {
+    padding: var(--space-12);
+  }
+}
+
+.darkStage {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-8);
+}
+
+@media (min-width: 768px) {
+  .darkStage {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.darkCopy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: 40rem;
+}
+
+.accentText {
+  color: var(--color-accent);
+}
+
+.darkControls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .darkControls {
+    flex-direction: row;
+    align-items: flex-end;
+  }
+}
+
+/* Responsive */
+.breakpointNow {
+  font-size: var(--text-small-size);
+}
+
+.breakpointLabel::after {
+  content: "Mobile (< 640px)";
+}
+
+@media (min-width: 640px) {
+  .breakpointLabel::after {
+    content: "Tablet (640px to 1023px)";
+  }
+}
+
+@media (min-width: 1024px) {
+  .breakpointLabel::after {
+    content: "Laptop (1024px to 1279px)";
+  }
+}
+
+@media (min-width: 1280px) {
+  .breakpointLabel::after {
+    content: "Desktop (>= 1280px)";
+  }
+}
+
+.tableWrap {
+  overflow-x: auto;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.table {
+  width: 100%;
+  min-width: 32rem;
+  border-collapse: collapse;
+  font-size: var(--text-small-size);
+  text-align: left;
+}
+
+.table th,
+.table td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: var(--border-width) solid var(--color-border);
+  vertical-align: top;
+}
+
+.table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.table thead th {
+  background-color: var(--color-background-subtle);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-foreground-muted);
+}

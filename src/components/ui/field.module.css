@@ -1,0 +1,128 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1-5);
+  min-width: 0;
+}
+
+.label {
+  display: inline-flex;
+  gap: var(--space-0-5);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-foreground);
+}
+
+.field[data-disabled] .label {
+  color: var(--color-foreground-muted);
+}
+
+.requiredMark {
+  color: var(--color-error);
+}
+
+.description {
+  margin-top: calc(var(--space-1) * -1);
+  font-size: var(--text-small-size);
+  line-height: var(--text-small-line);
+  color: var(--color-foreground-muted);
+}
+
+.error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1-5);
+  font-size: var(--text-small-size);
+  line-height: var(--text-small-line);
+  color: var(--color-error);
+}
+
+.errorIcon {
+  flex-shrink: 0;
+  margin-top: 0.2em;
+}
+
+/* Shared control surface for input, textarea, and select. */
+.control {
+  width: 100%;
+  min-width: 0;
+  height: var(--control-height-md);
+  padding-inline: var(--space-3);
+  border: var(--border-width) solid var(--color-border-control);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  color: var(--color-foreground);
+  /* 16px minimum avoids iOS zoom-on-focus. */
+  font-size: max(16px, var(--text-body-size));
+  line-height: 1.4;
+  transition:
+    border-color var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard);
+}
+
+.control::placeholder {
+  color: var(--color-foreground-subtle);
+}
+
+.control:hover:not(:disabled) {
+  border-color: var(--color-foreground-muted);
+}
+
+.control:focus-visible {
+  outline: none;
+  border-color: var(--color-focus-ring);
+  box-shadow: 0 0 0 1px var(--color-focus-ring);
+}
+
+.control[aria-invalid="true"] {
+  border-color: var(--color-error);
+}
+
+.control[aria-invalid="true"]:focus-visible {
+  box-shadow: 0 0 0 1px var(--color-error);
+}
+
+.control:disabled {
+  cursor: not-allowed;
+  background-color: var(--color-surface-sunken);
+  color: var(--color-foreground-muted);
+  border-color: var(--color-border-strong);
+}
+
+.textarea {
+  height: auto;
+  min-height: 6rem;
+  padding-block: var(--space-2);
+  resize: vertical;
+  line-height: var(--text-body-line);
+}
+
+.selectWrapper {
+  position: relative;
+  display: flex;
+}
+
+.select {
+  appearance: none;
+  padding-right: var(--space-10);
+  cursor: pointer;
+}
+
+/* Placeholder option selected: read as a hint, like an input placeholder. */
+.select:has(option[value=""]:checked) {
+  color: var(--color-foreground-subtle);
+}
+
+.select option {
+  color: var(--color-foreground);
+}
+
+.selectIcon {
+  position: absolute;
+  top: 50%;
+  right: var(--space-3);
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--color-foreground-muted);
+}

@@ -1,0 +1,68 @@
+/*
+ * Reusable motion utilities. Durations and easings come from tokens.css, which
+ * collapses durations to 0ms under prefers-reduced-motion.
+ */
+
+@keyframes oscar-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes oscar-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes oscar-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes oscar-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.motion-fade-in {
+  animation: oscar-fade-in var(--duration-standard) var(--ease-out) both;
+}
+
+.motion-rise-in {
+  animation: oscar-rise-in var(--duration-slow) var(--ease-out) both;
+}
+
+.motion-scale-in {
+  animation: oscar-scale-in var(--duration-standard) var(--ease-out) both;
+}
+
+/*
+ * Reduced motion: stop decorative looping and movement. Elements that convey
+ * progress (spinners) opt out with data-motion="essential" and slow down instead.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *:not([data-motion="essential"]),
+  *::before,
+  *::after {
+    animation-iteration-count: 1 !important;
+    animation-duration: 0ms !important;
+    transition-duration: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+}

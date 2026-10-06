@@ -9,7 +9,10 @@ export default defineConfig({
     },
   },
   test: {
-    environment: "node",
-    include: ["tests/**/*.test.ts", "src/**/*.test.ts"],
+    // Component tests need a DOM. Pure server tests opt into `node` per file.
+    environment: "jsdom",
+    setupFiles: ["./tests/setup.ts"],
+    include: ["tests/**/*.test.{ts,tsx}", "src/**/*.test.{ts,tsx}"],
+    css: { modules: { classNameStrategy: "non-scoped" } },
   },
 });

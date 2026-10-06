@@ -1,0 +1,65 @@
+.tabs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-width: 0;
+}
+
+.list {
+  display: flex;
+  gap: var(--space-1);
+  overflow-x: auto;
+  border-bottom: var(--border-width) solid var(--color-border);
+  scrollbar-width: none;
+}
+
+.tab {
+  position: relative;
+  flex-shrink: 0;
+  height: var(--control-height-md);
+  padding-inline: var(--space-3);
+  border: 0;
+  background: none;
+  font-size: var(--text-small-size);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-foreground-muted);
+  cursor: pointer;
+  transition: color var(--duration-fast) var(--ease-standard);
+}
+
+.tab::after {
+  content: "";
+  position: absolute;
+  inset-inline: var(--space-3);
+  bottom: -1px;
+  height: 2px;
+  background-color: var(--color-primary);
+  transform: scaleX(0);
+  transition: transform var(--duration-standard) var(--ease-out);
+}
+
+.tab:hover:not(:disabled) {
+  color: var(--color-foreground);
+}
+
+.tab[aria-selected="true"] {
+  color: var(--color-foreground);
+}
+
+.tab[aria-selected="true"]::after {
+  transform: scaleX(1);
+}
+
+.tab:focus-visible {
+  outline-offset: -2px;
+  border-radius: var(--radius-sm);
+}
+
+.tab:disabled {
+  color: var(--color-foreground-subtle);
+  cursor: not-allowed;
+}
+
+.panel:focus-visible {
+  border-radius: var(--radius-sm);
+}

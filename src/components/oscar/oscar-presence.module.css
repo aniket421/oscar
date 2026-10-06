@@ -1,0 +1,144 @@
+.presence {
+  display: inline-block;
+  flex-shrink: 0;
+  line-height: 0;
+}
+
+.sm {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.md {
+  width: 3rem;
+  height: 3rem;
+}
+
+.lg {
+  width: 6rem;
+  height: 6rem;
+}
+
+.xl {
+  width: 10rem;
+  height: 10rem;
+}
+
+.svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.halo {
+  fill: none;
+  stroke: var(--color-oscar-signal);
+  stroke-width: 1;
+  opacity: 0;
+  transform-origin: center;
+}
+
+.track {
+  fill: none;
+  stroke: var(--color-oscar-track);
+  stroke-width: 2;
+}
+
+.arc {
+  fill: none;
+  stroke: var(--color-oscar-signal);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 26 100;
+  transform: rotate(-90deg);
+  transform-origin: center;
+  transition:
+    stroke-dasharray var(--duration-slow) var(--ease-out),
+    stroke var(--duration-standard) var(--ease-standard);
+}
+
+.core {
+  fill: var(--color-oscar-core);
+}
+
+.signal {
+  fill: var(--color-oscar-signal);
+}
+
+.glyph {
+  fill: none;
+  stroke: var(--color-oscar-signal);
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.bars rect {
+  fill: var(--color-oscar-signal);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: oscar-voice 900ms var(--ease-standard) infinite alternate;
+}
+
+.bars rect:nth-child(2) {
+  animation-delay: 150ms;
+}
+
+.bars rect:nth-child(3) {
+  animation-delay: 300ms;
+}
+
+/* States */
+.presence[data-state="listening"] .halo {
+  animation: oscar-listen 1800ms var(--ease-out) infinite;
+}
+
+.presence[data-state="thinking"] .arc {
+  animation: oscar-orbit 1400ms linear infinite;
+}
+
+.presence[data-state="speaking"] .arc {
+  stroke-dasharray: 48 100;
+}
+
+.presence[data-state="success"] .arc {
+  stroke-dasharray: 100 0;
+}
+
+.presence[data-state="error"] .arc {
+  stroke: var(--color-error);
+  stroke-dasharray: 100 0;
+}
+
+.presence[data-state="error"] .glyph {
+  stroke: var(--color-oscar-glyph);
+}
+
+@keyframes oscar-orbit {
+  from {
+    transform: rotate(-90deg);
+  }
+  to {
+    transform: rotate(270deg);
+  }
+}
+
+@keyframes oscar-listen {
+  0% {
+    opacity: 0.6;
+    transform: scale(0.96);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.14);
+  }
+}
+
+@keyframes oscar-voice {
+  from {
+    transform: scaleY(0.45);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}

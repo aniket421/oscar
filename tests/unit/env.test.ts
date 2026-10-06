@@ -1,3 +1,5 @@
+// @vitest-environment node
+
 import { describe, expect, it } from "vitest";
 
 import { MissingEnvError, readEnv, requireEnv } from "@/lib/env";

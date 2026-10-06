@@ -1,0 +1,39 @@
+.skeleton {
+  display: block;
+  width: 100%;
+  background-color: var(--color-skeleton);
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--color-skeleton-highlight) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: skeleton-shimmer 1600ms var(--ease-standard) infinite;
+}
+
+.line {
+  height: 1em;
+  border-radius: var(--radius-sm);
+}
+
+.block {
+  height: 6rem;
+  border-radius: var(--radius-lg);
+}
+
+.circle {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-full);
+}
+
+@keyframes skeleton-shimmer {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}

@@ -1,0 +1,346 @@
+/*
+ * Oscar 2.0 design tokens. The single source of truth for visual values.
+ *
+ * Layer 1 (primitives, --palette-*): raw values. Only referenced in this file.
+ * Layer 2 (semantic, --color-*, --space-*, ...): what components use.
+ *
+ * Components must never reference --palette-* or raw hex values directly.
+ * The dark interview theme re-maps semantic tokens only, so any component built
+ * on semantic tokens works on both themes without changes.
+ */
+
+:root {
+  /* ---------- Palette primitives ---------- */
+  --palette-white: #ffffff;
+  --palette-neutral-50: #f7f7f6;
+  --palette-neutral-100: #efefed;
+  --palette-neutral-200: #e3e3e0;
+  --palette-neutral-300: #cfcfcb;
+  --palette-neutral-400: #a3a3a0;
+  --palette-neutral-450: #8c8c89;
+  --palette-neutral-500: #6e6e6b;
+  --palette-neutral-600: #5c5c59;
+  --palette-neutral-700: #3f3f3d;
+  --palette-neutral-800: #282827;
+  --palette-neutral-850: #1d1d1c;
+  --palette-neutral-900: #151514;
+  --palette-neutral-950: #0c0c0b;
+  --palette-black: #000000;
+
+  --palette-emerald-50: #ecfdf5;
+  --palette-emerald-100: #d1fae5;
+  --palette-emerald-200: #a7f3d0;
+  --palette-emerald-300: #6ee7b7;
+  --palette-emerald-400: #34d399;
+  --palette-emerald-500: #10b981;
+  --palette-emerald-600: #059669;
+  --palette-emerald-700: #047857;
+  --palette-emerald-800: #065f46;
+  --palette-emerald-900: #064e3b;
+  --palette-emerald-950: #022c22;
+
+  --palette-amber-50: #fffbeb;
+  --palette-amber-200: #fde68a;
+  --palette-amber-300: #fcd34d;
+  --palette-amber-700: #b45309;
+  --palette-amber-950: #2a1704;
+
+  --palette-red-50: #fef2f2;
+  --palette-red-200: #fecaca;
+  --palette-red-300: #fca5a5;
+  --palette-red-400: #f87171;
+  --palette-red-700: #b91c1c;
+  --palette-red-800: #991b1b;
+  --palette-red-950: #2b0b0b;
+
+  --palette-slate-50: #f4f6f8;
+  --palette-slate-300: #c3cbd5;
+  --palette-slate-400: #a9b4c2;
+  --palette-slate-700: #36424f;
+  --palette-slate-950: #12171d;
+
+  /* ---------- Semantic colors (light, default) ---------- */
+  --color-background: var(--palette-white);
+  --color-background-subtle: var(--palette-neutral-50);
+  --color-surface: var(--palette-white);
+  --color-surface-elevated: var(--palette-white);
+  --color-surface-sunken: var(--palette-neutral-100);
+  --color-surface-inverse: var(--palette-neutral-900);
+
+  --color-foreground: var(--palette-neutral-950);
+  --color-foreground-muted: var(--palette-neutral-600);
+  --color-foreground-subtle: var(--palette-neutral-500);
+  --color-foreground-inverse: var(--palette-white);
+
+  --color-border: var(--palette-neutral-200);
+  --color-border-strong: var(--palette-neutral-300);
+  /* Form control boundaries need >= 3:1 against the surface (WCAG 1.4.11). */
+  --color-border-control: var(--palette-neutral-450);
+
+  --color-primary: var(--palette-emerald-700);
+  --color-primary-hover: var(--palette-emerald-800);
+  --color-primary-active: var(--palette-emerald-900);
+  --color-primary-foreground: var(--palette-white);
+  --color-primary-subtle: var(--palette-emerald-50);
+  --color-primary-subtle-foreground: var(--palette-emerald-800);
+  /* Accent is used for text (eyebrows, links), so it must reach 4.5:1. */
+  --color-accent: var(--palette-emerald-700);
+
+  --color-secondary: var(--palette-neutral-900);
+  --color-secondary-hover: var(--palette-neutral-800);
+  --color-secondary-active: var(--palette-neutral-700);
+  --color-secondary-foreground: var(--palette-white);
+
+  --color-interactive-hover: var(--palette-neutral-100);
+  --color-interactive-active: var(--palette-neutral-200);
+
+  --color-success: var(--palette-emerald-700);
+  --color-success-surface: var(--palette-emerald-50);
+  --color-success-border: var(--palette-emerald-200);
+
+  --color-warning: var(--palette-amber-700);
+  --color-warning-surface: var(--palette-amber-50);
+  --color-warning-border: var(--palette-amber-200);
+
+  --color-error: var(--palette-red-700);
+  --color-error-hover: var(--palette-red-800);
+  --color-error-foreground: var(--palette-white);
+  --color-error-surface: var(--palette-red-50);
+  --color-error-border: var(--palette-red-200);
+
+  --color-info: var(--palette-slate-700);
+  --color-info-surface: var(--palette-slate-50);
+  --color-info-border: var(--palette-slate-300);
+
+  --color-oscar-core: var(--palette-neutral-900);
+  --color-oscar-signal: var(--palette-emerald-500);
+  --color-oscar-track: var(--palette-neutral-200);
+  /* Glyphs drawn on the charcoal core when the signal color would lack contrast. */
+  --color-oscar-glyph: var(--palette-white);
+
+  --color-focus-ring: var(--palette-emerald-600);
+  --color-selection: var(--palette-emerald-200);
+  --color-selection-foreground: var(--palette-neutral-950);
+  --color-overlay: rgb(12 12 11 / 0.56);
+  --color-skeleton: var(--palette-neutral-100);
+  --color-skeleton-highlight: var(--palette-neutral-50);
+
+  /* ---------- Typography ---------- */
+  --font-sans:
+    var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono:
+    var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono",
+    monospace;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+  /* Fluid sizes scale between ~360px and ~1440px viewports. */
+  --text-display-size: clamp(2.75rem, 1.95rem + 3.55vw, 4.75rem);
+  --text-display-line: 1.02;
+  --text-display-tracking: -0.04em;
+
+  --text-h1-size: clamp(2.25rem, 1.75rem + 2.2vw, 3.5rem);
+  --text-h1-line: 1.06;
+  --text-h1-tracking: -0.035em;
+
+  --text-h2-size: clamp(1.75rem, 1.45rem + 1.35vw, 2.5rem);
+  --text-h2-line: 1.12;
+  --text-h2-tracking: -0.028em;
+
+  --text-h3-size: clamp(1.375rem, 1.275rem + 0.45vw, 1.625rem);
+  --text-h3-line: 1.25;
+  --text-h3-tracking: -0.02em;
+
+  --text-h4-size: 1.125rem;
+  --text-h4-line: 1.4;
+  --text-h4-tracking: -0.012em;
+
+  --text-lead-size: 1.125rem;
+  --text-lead-line: 1.6;
+
+  --text-body-size: 1rem;
+  --text-body-line: 1.6;
+
+  --text-small-size: 0.875rem;
+  --text-small-line: 1.5;
+
+  --text-caption-size: 0.75rem;
+  --text-caption-line: 1.4;
+
+  --text-label-size: 0.875rem;
+  --text-label-line: 1.35;
+
+  --text-button-size: 0.9375rem;
+  --text-button-size-sm: 0.875rem;
+  --text-button-tracking: -0.006em;
+
+  --text-overline-size: 0.75rem;
+  --text-overline-tracking: 0.08em;
+
+  /* ---------- Spacing (4px base) ---------- */
+  --space-0: 0;
+  --space-px: 1px;
+  --space-0-5: 0.125rem; /* 2 */
+  --space-1: 0.25rem; /* 4 */
+  --space-1-5: 0.375rem; /* 6 */
+  --space-2: 0.5rem; /* 8 */
+  --space-3: 0.75rem; /* 12 */
+  --space-4: 1rem; /* 16 */
+  --space-5: 1.25rem; /* 20 */
+  --space-6: 1.5rem; /* 24 */
+  --space-8: 2rem; /* 32 */
+  --space-10: 2.5rem; /* 40 */
+  --space-12: 3rem; /* 48 */
+  --space-16: 4rem; /* 64 */
+  --space-20: 5rem; /* 80 */
+  --space-24: 6rem; /* 96 */
+  --space-32: 8rem; /* 128 */
+
+  /* Layout spacing (semantic, responsive). */
+  --space-gutter: clamp(1rem, 0.6rem + 1.8vw, 2rem);
+  --space-section: clamp(4rem, 2.9rem + 4.9vw, 8rem);
+  --space-stack: var(--space-6);
+  --space-card: var(--space-6);
+  --space-card-compact: var(--space-4);
+
+  --container-max: 75rem; /* 1200 */
+  --container-narrow: 45rem; /* 720 */
+
+  /* Control heights keep buttons and inputs aligned on one row. */
+  --control-height-sm: 2rem; /* 32 */
+  --control-height-md: 2.5rem; /* 40 */
+  --control-height-lg: 3rem; /* 48 */
+
+  /* ---------- Radius (restrained) ---------- */
+  --radius-none: 0;
+  --radius-sm: 0.25rem; /* 4: badges, checkboxes, small chips */
+  --radius-md: 0.375rem; /* 6: buttons, inputs, menus */
+  --radius-lg: 0.625rem; /* 10: cards, dialogs */
+  --radius-xl: 1rem; /* 16: feature surfaces only */
+  --radius-full: 9999px; /* avatars, switch track, Oscar presence only */
+
+  /* ---------- Borders ---------- */
+  --border-width: 1px;
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+
+  /* ---------- Elevation ---------- */
+  --shadow-color: 20 20 18;
+  --shadow-xs: 0 1px 2px rgb(var(--shadow-color) / 0.05);
+  --shadow-sm: 0 1px 2px rgb(var(--shadow-color) / 0.04), 0 1px 3px rgb(var(--shadow-color) / 0.06);
+  --shadow-md:
+    0 2px 4px -2px rgb(var(--shadow-color) / 0.05), 0 6px 16px -4px rgb(var(--shadow-color) / 0.08);
+  --shadow-lg:
+    0 4px 12px -4px rgb(var(--shadow-color) / 0.06),
+    0 24px 48px -16px rgb(var(--shadow-color) / 0.18);
+  /* A 1px top highlight that reads as a lit edge on dark surfaces. */
+  --highlight-edge: inset 0 1px 0 rgb(255 255 255 / 0);
+
+  /* ---------- Motion ---------- */
+  --duration-instant: 0ms;
+  --duration-fast: 120ms;
+  --duration-standard: 200ms;
+  --duration-slow: 480ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+
+  /* ---------- Layering ---------- */
+  --z-dropdown: 30;
+  --z-sticky: 40;
+  --z-overlay: 50;
+  --z-toast: 60;
+  --z-tooltip: 70;
+
+  color-scheme: light;
+}
+
+/*
+ * Dark theme for interview experiences. Apply `data-theme="dark"` to any element
+ * (a page root or a single panel); everything inside re-maps automatically.
+ */
+[data-theme="dark"] {
+  --color-background: var(--palette-neutral-950);
+  --color-background-subtle: var(--palette-neutral-900);
+  --color-surface: var(--palette-neutral-900);
+  --color-surface-elevated: var(--palette-neutral-850);
+  --color-surface-sunken: var(--palette-black);
+  --color-surface-inverse: var(--palette-neutral-50);
+
+  --color-foreground: var(--palette-neutral-50);
+  --color-foreground-muted: var(--palette-neutral-400);
+  --color-foreground-subtle: var(--palette-neutral-450);
+  --color-foreground-inverse: var(--palette-neutral-950);
+
+  --color-border: var(--palette-neutral-800);
+  --color-border-strong: var(--palette-neutral-700);
+  --color-border-control: var(--palette-neutral-500);
+
+  --color-primary: var(--palette-emerald-500);
+  --color-primary-hover: var(--palette-emerald-400);
+  --color-primary-active: var(--palette-emerald-300);
+  --color-primary-foreground: var(--palette-neutral-950);
+  --color-primary-subtle: var(--palette-emerald-950);
+  --color-primary-subtle-foreground: var(--palette-emerald-300);
+  --color-accent: var(--palette-emerald-400);
+
+  --color-secondary: var(--palette-neutral-50);
+  --color-secondary-hover: var(--palette-neutral-200);
+  --color-secondary-active: var(--palette-neutral-300);
+  --color-secondary-foreground: var(--palette-neutral-950);
+
+  --color-interactive-hover: var(--palette-neutral-800);
+  --color-interactive-active: var(--palette-neutral-700);
+
+  --color-success: var(--palette-emerald-400);
+  --color-success-surface: var(--palette-emerald-950);
+  --color-success-border: var(--palette-emerald-900);
+
+  --color-warning: var(--palette-amber-300);
+  --color-warning-surface: var(--palette-amber-950);
+  --color-warning-border: var(--palette-amber-700);
+
+  --color-error: var(--palette-red-400);
+  --color-error-hover: var(--palette-red-300);
+  --color-error-foreground: var(--palette-neutral-950);
+  --color-error-surface: var(--palette-red-950);
+  --color-error-border: var(--palette-red-800);
+
+  --color-info: var(--palette-slate-400);
+  --color-info-surface: var(--palette-slate-950);
+  --color-info-border: var(--palette-slate-700);
+
+  --color-oscar-core: var(--palette-neutral-850);
+  --color-oscar-signal: var(--palette-emerald-400);
+  --color-oscar-track: var(--palette-neutral-800);
+  --color-oscar-glyph: var(--palette-neutral-50);
+
+  --color-focus-ring: var(--palette-emerald-400);
+  --color-selection: var(--palette-emerald-800);
+  --color-selection-foreground: var(--palette-neutral-50);
+  --color-overlay: rgb(0 0 0 / 0.72);
+  --color-skeleton: var(--palette-neutral-850);
+  --color-skeleton-highlight: var(--palette-neutral-800);
+
+  --shadow-color: 0 0 0;
+  --shadow-xs: 0 1px 2px rgb(var(--shadow-color) / 0.4);
+  --shadow-sm: 0 1px 3px rgb(var(--shadow-color) / 0.5);
+  --shadow-md: 0 8px 20px -6px rgb(var(--shadow-color) / 0.6);
+  --shadow-lg: 0 28px 56px -16px rgb(var(--shadow-color) / 0.75);
+  --highlight-edge: inset 0 1px 0 rgb(255 255 255 / 0.05);
+
+  color-scheme: dark;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-standard: 0ms;
+    --duration-slow: 0ms;
+  }
+}

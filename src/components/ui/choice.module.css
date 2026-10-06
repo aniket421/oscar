@@ -1,0 +1,209 @@
+/* Checkbox, radio, and switch share this layout. */
+
+.choice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.choice[data-disabled] .label,
+.choice[data-disabled] .description {
+  color: var(--color-foreground-subtle);
+}
+
+.choice[data-disabled] .label {
+  cursor: not-allowed;
+}
+
+.switchRow {
+  justify-content: space-between;
+  /* Keep the toggle visually tied to its label on wide layouts. */
+  max-width: var(--container-narrow);
+}
+
+.boxWrapper {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  /* Align the 18px box with the first line of 14px/1.35 label text. */
+  margin-top: 0.0625rem;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5);
+  min-width: 0;
+}
+
+.label {
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-foreground);
+  cursor: pointer;
+}
+
+.description {
+  font-size: var(--text-small-size);
+  line-height: var(--text-small-line);
+  color: var(--color-foreground-muted);
+}
+
+.input {
+  appearance: none;
+  margin: 0;
+  flex-shrink: 0;
+  border: var(--border-width) solid var(--color-border-control);
+  background-color: var(--color-surface);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard);
+}
+
+.input:hover:not(:disabled) {
+  border-color: var(--color-foreground-muted);
+}
+
+.input:disabled {
+  cursor: not-allowed;
+  background-color: var(--color-surface-sunken);
+  border-color: var(--color-border-strong);
+}
+
+.input[aria-invalid="true"] {
+  border-color: var(--color-error);
+}
+
+/* Checkbox */
+.checkbox {
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: var(--radius-sm);
+}
+
+.checkbox:checked {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.checkbox:checked:disabled {
+  opacity: 0.5;
+}
+
+.checkIcon {
+  position: absolute;
+  color: var(--color-primary-foreground);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--ease-standard);
+}
+
+.checkbox:checked + .checkIcon {
+  opacity: 1;
+}
+
+/* Radio */
+.radio {
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: var(--radius-full);
+}
+
+.radio:checked {
+  border-color: var(--color-primary);
+  border-width: 5px;
+}
+
+.radio:checked:disabled {
+  opacity: 0.5;
+}
+
+/* Switch */
+.switch {
+  position: relative;
+  width: 2.25rem;
+  height: 1.25rem;
+  border-radius: var(--radius-full);
+  background-color: var(--color-border-strong);
+  border-color: transparent;
+}
+
+.switch::before {
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: calc(1.25rem - 4px);
+  height: calc(1.25rem - 4px);
+  border-radius: var(--radius-full);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--duration-standard) var(--ease-out);
+}
+
+.switch:hover:not(:disabled) {
+  border-color: transparent;
+  background-color: var(--color-border-control);
+}
+
+.switch:checked {
+  background-color: var(--color-primary);
+}
+
+.switch:checked:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+}
+
+.switch:checked::before {
+  transform: translateX(1rem);
+}
+
+.switch:disabled {
+  opacity: 0.5;
+  background-color: var(--color-border-strong);
+}
+
+.switch:checked:disabled {
+  background-color: var(--color-primary);
+}
+
+/* Radio group */
+.fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.legend {
+  display: inline-flex;
+  gap: var(--space-0-5);
+  padding: 0;
+  margin-bottom: var(--space-1);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-foreground);
+}
+
+.requiredMark {
+  color: var(--color-error);
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.options[data-orientation="horizontal"] {
+  flex-flow: row wrap;
+  column-gap: var(--space-6);
+}
