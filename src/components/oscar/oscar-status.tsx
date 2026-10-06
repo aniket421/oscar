@@ -12,6 +12,8 @@ export interface OscarStatusProps {
   actions?: ReactNode;
   /** Announce changes politely (use for loading and async outcomes). */
   live?: boolean;
+  /** `md` for compact regions; `lg` (default) for page-level states. */
+  size?: "md" | "lg";
   className?: string;
 }
 
@@ -25,6 +27,7 @@ export function OscarStatus({
   description,
   actions,
   live = false,
+  size = "lg",
   className,
 }: OscarStatusProps) {
   return (
@@ -33,7 +36,7 @@ export function OscarStatus({
       role={live ? "status" : undefined}
       aria-busy={state === "thinking" || undefined}
     >
-      <OscarPresence state={state} size="lg" decorative />
+      <OscarPresence state={state} size={size} decorative />
       <div className={styles.text}>
         <p className={styles.title}>{title}</p>
         {description ? <p className={styles.description}>{description}</p> : null}

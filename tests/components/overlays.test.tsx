@@ -301,3 +301,32 @@ describe("Toast", () => {
     spy.mockRestore();
   });
 });
+
+describe("DropdownMenu link items and header", () => {
+  it("renders link items as real links and shows a header", async () => {
+    const user = userEvent.setup();
+    render(
+      <DropdownMenu
+        label="Account"
+        header={<span>Signed in as ada@example.com</span>}
+        items={[
+          { id: "profile", label: "Profile", href: "/profile" },
+          { id: "logout", label: "Log out", onSelect: () => {} },
+        ]}
+        trigger={(props) => <Button {...props}>Account</Button>}
+      />,
+    );
+    screen.getByRole("button", { name: "Account" }).focus();
+    await user.keyboard("{ArrowDown}");
+    const profile = screen.getByRole("menuitem", { name: "Profile" });
+    expect(profile.tagName).toBe("A");
+    expect(profile).toHaveAttribute("href", "/profile");
+    expect(profile).toHaveFocus();
+    expect(screen.getByText("Signed in as ada@example.com")).toBeVisible();
+    await user.keyboard("{ArrowDown}");
+    expect(screen.getByRole("menuitem", { name: "Log out" })).toHaveFocus();
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+    expect(screen.queryByText("Signed in as ada@example.com")).not.toBeVisible();
+  });
+});

@@ -8,6 +8,7 @@ import {
   authRoutes,
   LoginForm,
   parseNotice,
+  ResetOnHide,
   safeRedirectPath,
 } from "@/features/auth";
 
@@ -41,9 +42,11 @@ async function LoginFormWithParams({ searchParams }: Pick<PageProps<"/login">, "
   const params = await searchParams;
   const first = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value);
   return (
-    <LoginForm
-      next={safeRedirectPath(first(params.next))}
-      notice={parseNotice(first(params.notice))}
-    />
+    <ResetOnHide>
+      <LoginForm
+        next={safeRedirectPath(first(params.next))}
+        notice={parseNotice(first(params.notice))}
+      />
+    </ResetOnHide>
   );
 }

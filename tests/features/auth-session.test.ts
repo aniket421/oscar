@@ -33,6 +33,7 @@ describe("toAuthUser", () => {
       id: "user-1",
       email: "ada@example.com",
       name: "Ada Lovelace",
+      createdAt: null,
     });
   });
 
@@ -44,7 +45,7 @@ describe("toAuthUser", () => {
 describe("requireUser", () => {
   it("returns the verified user", async () => {
     getUser.mockResolvedValue({ data: { user }, error: null });
-    await expect(requireUser("/app")).resolves.toMatchObject({ id: "user-1" });
+    await expect(requireUser("/dashboard")).resolves.toMatchObject({ id: "user-1" });
   });
 
   it("redirects to login when the session is invalid", async () => {
@@ -52,8 +53,8 @@ describe("requireUser", () => {
       data: { user: null },
       error: { status: 403, code: "session_not_found" },
     });
-    await expect(requireUser("/app/reports")).rejects.toThrow(
-      "REDIRECT /login?next=%2Fapp%2Freports",
+    await expect(requireUser("/interviews/new")).rejects.toThrow(
+      "REDIRECT /login?next=%2Finterviews%2Fnew",
     );
   });
 });

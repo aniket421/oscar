@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { KeyboardEvent, ReactNode } from "react";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 
@@ -7,15 +8,28 @@ import { cn } from "@/lib/cn";
 
 import styles from "./dropdown-menu.module.css";
 
-export interface DropdownMenuItem {
+interface DropdownMenuItemBase {
   /** Stable key for the item. */
   id: string;
   label: ReactNode;
-  onSelect: () => void;
   disabled?: boolean;
   /** Styles the item as a destructive action. */
   destructive?: boolean;
 }
+
+/** An item that performs an action (rendered as a button). */
+export interface DropdownMenuActionItem extends DropdownMenuItemBase {
+  onSelect: () => void;
+  href?: never;
+}
+
+/** An item that navigates (rendered as a real link, so it can be opened in a new tab). */
+export interface DropdownMenuLinkItem extends DropdownMenuItemBase {
+  href: string;
+  onSelect?: never;
+}
+
+export type DropdownMenuItem = DropdownMenuActionItem | DropdownMenuLinkItem;
 
 export interface DropdownMenuProps {
   /** Renders the trigger. Spread `triggerProps` onto a `<button>` (e.g. Button or IconButton). */
@@ -23,6 +37,8 @@ export interface DropdownMenuProps {
   items: readonly DropdownMenuItem[];
   /** Accessible name for the menu. */
   label: string;
+  /** Non-interactive content above the items (e.g. who is signed in). */
+  header?: ReactNode;
   align?: "start" | "end";
   className?: string;
 }
@@ -45,12 +61,13 @@ export function DropdownMenu({
   trigger,
   items,
   label,
+  header,
   align = "start",
   className,
 }: DropdownMenuProps) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
-  const itemRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const itemRefs = useRef<Array<HTMLElement | null>>([]);
   const [initialFocus, setInitialFocus] = useState<"first" | "last">("first");
   const triggerId = useId();
   const menuId = useId();
@@ -144,33 +161,56 @@ export function DropdownMenu({
         onClick: () => (open ? close(false) : openMenu("first")),
         onKeyDown: onTriggerKeyDown,
       })}
-      <div
-        id={menuId}
-        role="menu"
-        aria-label={label}
-        className={cn(styles.menu, styles[align])}
-        hidden={!open}
-        onKeyDown={onMenuKeyDown}
-      >
-        {items.map((item, index) => (
-          <button
-            key={item.id}
-            ref={(element) => {
+      <div className={cn(styles.popover, styles[align])} hidden={!open}>
+        {header ? <div className={styles.header}>{header}</div> : null}
+        <div
+          id={menuId}
+          role="menu"
+          aria-label={label}
+          className={styles.menu}
+          onKeyDown={onMenuKeyDown}
+        >
+          {items.map((item, index) => {
+            const setRef = (element: HTMLElement | null) => {
               itemRefs.current[index] = element;
-            }}
-            type="button"
-            role="menuitem"
-            tabIndex={-1}
-            disabled={item.disabled}
-            className={cn(styles.item, item.destructive && styles.destructive)}
-            onClick={() => {
-              close(true);
-              item.onSelect();
-            }}
-          >
-            {item.label}
-          </button>
-        ))}
+            };
+            const className = cn(styles.item, item.destructive && styles.destructive);
+
+            if (item.href !== undefined && !item.disabled) {
+              return (
+                <Link
+                  key={item.id}
+                  ref={setRef}
+                  href={item.href}
+                  role="menuitem"
+                  tabIndex={-1}
+                  className={className}
+                  onClick={() => close(false)}
+                >
+                  {item.label}
+                </Link>
+              );
+            }
+
+            return (
+              <button
+                key={item.id}
+                ref={setRef}
+                type="button"
+                role="menuitem"
+                tabIndex={-1}
+                disabled={item.disabled}
+                className={className}
+                onClick={() => {
+                  close(true);
+                  item.onSelect?.();
+                }}
+              >
+                {item.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

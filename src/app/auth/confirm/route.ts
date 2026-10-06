@@ -46,5 +46,5 @@ export async function GET(request: NextRequest) {
     return failure;
   }
 
-  return NextResponse.redirect(new URL(authRoutes.app, request.url));
+  return NextResponse.redirect(new URL(authRoutes.home, request.url));
 }

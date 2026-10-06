@@ -1,0 +1,94 @@
+.groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.groupLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding-inline: var(--space-3);
+  margin-bottom: var(--space-1);
+  font-size: var(--text-overline-size);
+  line-height: var(--text-caption-line);
+  letter-spacing: var(--text-overline-tracking);
+  text-transform: uppercase;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-foreground-muted);
+}
+
+.later {
+  padding-inline: var(--space-1-5);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-caption-size);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-foreground-muted);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--control-height-md);
+  padding-inline: var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--text-small-size);
+  color: var(--color-foreground-muted);
+  text-decoration: none;
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
+}
+
+.link:hover {
+  background-color: var(--color-interactive-hover);
+  color: var(--color-foreground);
+}
+
+.link:focus-visible {
+  outline-offset: -2px;
+}
+
+.icon {
+  flex-shrink: 0;
+}
+
+.active {
+  background-color: var(--color-surface);
+  color: var(--color-foreground);
+  font-weight: var(--font-weight-medium);
+  box-shadow: inset 0 0 0 var(--border-width) var(--color-border);
+}
+
+.active .icon {
+  color: var(--color-accent);
+}
+
+.active::before {
+  content: "";
+  position: absolute;
+  inset-block: var(--space-2);
+  left: 0;
+  width: 2px;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-accent);
+}

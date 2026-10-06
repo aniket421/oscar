@@ -27,7 +27,7 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
-const { login, logout, signup } = await import("@/features/auth/actions");
+const { login, signup } = await import("@/features/auth/actions");
 
 function form(values: Record<string, string>): FormData {
   const data = new FormData();
@@ -77,8 +77,8 @@ describe("login", () => {
   it("redirects to a safe destination on success", async () => {
     auth.signInWithPassword.mockResolvedValue({ error: null });
     await expect(
-      login(idle, form({ email: "A@B.co", password: "pw", next: "/app?x=1" })),
-    ).rejects.toThrow("REDIRECT /app?x=1");
+      login(idle, form({ email: "A@B.co", password: "pw", next: "/resume?x=1" })),
+    ).rejects.toThrow("REDIRECT /resume?x=1");
     expect(auth.signInWithPassword).toHaveBeenCalledWith({ email: "a@b.co", password: "pw" });
   });
 
@@ -86,7 +86,7 @@ describe("login", () => {
     auth.signInWithPassword.mockResolvedValue({ error: null });
     await expect(
       login(idle, form({ email: "a@b.co", password: "pw", next: "https://evil.example" })),
-    ).rejects.toThrow("REDIRECT /app");
+    ).rejects.toThrow("REDIRECT /dashboard");
   });
 
   it("reports unavailability when auth is not configured", async () => {
@@ -137,7 +137,7 @@ describe("signup", () => {
       data: { user: { identities: [{}] }, session: { access_token: "t" } },
       error: null,
     });
-    await expect(signup(idle, form(valid))).rejects.toThrow("REDIRECT /app");
+    await expect(signup(idle, form(valid))).rejects.toThrow("REDIRECT /dashboard");
   });
 
   it("detects duplicate accounts from an explicit error", async () => {
@@ -176,22 +176,5 @@ describe("signup", () => {
       status: "error",
       fieldErrors: { password: expect.stringMatching(/breach/) },
     });
-  });
-});
-
-describe("logout", () => {
-  it("signs out locally, clears session cookies, and redirects", async () => {
-    auth.signOut.mockResolvedValue({ error: null });
-    await expect(logout()).rejects.toThrow("REDIRECT /login?notice=signed_out");
-    expect(auth.signOut).toHaveBeenCalledWith({ scope: "local" });
-    expect(cookieStore.delete).toHaveBeenCalledWith("sb-project-auth-token");
-    expect(cookieStore.delete).toHaveBeenCalledWith("sb-project-auth-token.1");
-    expect(cookieStore.delete).not.toHaveBeenCalledWith("unrelated");
-  });
-
-  it("still clears cookies when the provider is unreachable", async () => {
-    auth.signOut.mockRejectedValue(new Error("offline"));
-    await expect(logout()).rejects.toThrow("REDIRECT /login?notice=signed_out");
-    expect(cookieStore.delete).toHaveBeenCalledWith("sb-project-auth-token");
   });
 });

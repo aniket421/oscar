@@ -33,6 +33,13 @@ export async function logIn(page: Page, email = testUser.email, password = testU
   await page.getByRole("button", { name: "Log in" }).click();
 }
 
+/** Logs in and waits until the workspace has loaded, so the session cookie is set. */
+export async function logInToWorkspace(page: Page) {
+  await logIn(page);
+  await expect(page).toHaveURL("/dashboard");
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+}
+
 /** Collects console errors and failed page errors so each test can assert none occurred. */
 export function trackConsoleErrors(page: Page): () => void {
   const errors: string[] = [];

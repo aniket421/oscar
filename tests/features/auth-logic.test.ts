@@ -3,7 +3,12 @@
 import { describe, expect, it } from "vitest";
 
 import { authMessages, describeAuthError } from "@/features/auth/errors";
-import { decideRouteAccess, loginUrl, safeRedirectPath } from "@/features/auth/routes";
+import {
+  decideRouteAccess,
+  isSameOriginRequest,
+  loginUrl,
+  safeRedirectPath,
+} from "@/features/auth/routes";
 import { validateLogin, validateNewPassword, validateSignup } from "@/features/auth/validation";
 
 function form(values: Record<string, string>): FormData {
@@ -146,22 +151,27 @@ describe("describeAuthError", () => {
 });
 
 describe("safeRedirectPath", () => {
-  it.each(["/app", "/app/settings", "/app?tab=reports"])("allows %s", (path) => {
-    expect(safeRedirectPath(path)).toBe(path);
-  });
+  it.each(["/dashboard", "/interviews/new", "/practice/coding", "/settings?tab=account"])(
+    "allows %s",
+    (path) => {
+      expect(safeRedirectPath(path)).toBe(path);
+    },
+  );
 
   it.each([
-    "https://evil.example/app",
-    "//evil.example/app",
+    "https://evil.example/dashboard",
+    "//evil.example/dashboard",
     "/\\evil.example",
     "/login",
     "/",
     "/apple",
+    "/dashboards",
+    "/app",
     "javascript:alert(1)",
-    "/app path",
+    "/dashboard path",
     undefined,
     42,
-    `/app/${"x".repeat(600)}`,
+    `/dashboard/${"x".repeat(600)}`,
   ])("rejects %j", (value) => {
     expect(safeRedirectPath(value)).toBeUndefined();
   });
@@ -169,12 +179,12 @@ describe("safeRedirectPath", () => {
 
 describe("loginUrl", () => {
   it("omits the default destination", () => {
-    expect(loginUrl({ next: "/app" })).toBe("/login");
+    expect(loginUrl({ next: "/dashboard" })).toBe("/login");
   });
 
   it("encodes the destination and notice", () => {
-    expect(loginUrl({ next: "/app?x=1", notice: "session_expired" })).toBe(
-      "/login?next=%2Fapp%3Fx%3D1&notice=session_expired",
+    expect(loginUrl({ next: "/resume?x=1", notice: "session_expired" })).toBe(
+      "/login?next=%2Fresume%3Fx%3D1&notice=session_expired",
     );
   });
 
@@ -187,14 +197,14 @@ describe("decideRouteAccess", () => {
   const base = { search: "", sessionRejected: false, isAuthenticated: false };
 
   it("sends visitors from protected pages to login with a return path", () => {
-    expect(decideRouteAccess({ ...base, pathname: "/app/reports", search: "?id=1" })).toEqual({
+    expect(decideRouteAccess({ ...base, pathname: "/interviews/new", search: "?id=1" })).toEqual({
       type: "redirect",
-      location: "/login?next=%2Fapp%2Freports%3Fid%3D1",
+      location: "/login?next=%2Finterviews%2Fnew%3Fid%3D1",
     });
   });
 
   it("explains expired sessions", () => {
-    expect(decideRouteAccess({ ...base, pathname: "/app", sessionRejected: true })).toEqual({
+    expect(decideRouteAccess({ ...base, pathname: "/dashboard", sessionRejected: true })).toEqual({
       type: "redirect",
       location: "/login?notice=session_expired",
     });
@@ -203,18 +213,67 @@ describe("decideRouteAccess", () => {
   it("sends signed-in users away from login and signup", () => {
     expect(decideRouteAccess({ ...base, pathname: "/login", isAuthenticated: true })).toEqual({
       type: "redirect",
-      location: "/app",
+      location: "/dashboard",
     });
     expect(
-      decideRouteAccess({ ...base, pathname: "/signup", isAuthenticated: true, next: "/app/x" }),
-    ).toEqual({ type: "redirect", location: "/app/x" });
+      decideRouteAccess({ ...base, pathname: "/signup", isAuthenticated: true, next: "/roadmap" }),
+    ).toEqual({ type: "redirect", location: "/roadmap" });
   });
 
   it("allows everything else", () => {
     expect(decideRouteAccess({ ...base, pathname: "/login" })).toEqual({ type: "allow" });
-    expect(decideRouteAccess({ ...base, pathname: "/app", isAuthenticated: true })).toEqual({
+    expect(decideRouteAccess({ ...base, pathname: "/dashboard", isAuthenticated: true })).toEqual({
       type: "allow",
     });
     expect(decideRouteAccess({ ...base, pathname: "/" })).toEqual({ type: "allow" });
+  });
+});
+
+describe("isSameOriginRequest", () => {
+  const url = "http://localhost:3000/auth/logout";
+  const headers = (values: Record<string, string>) => new Headers(values);
+
+  it("accepts a matching Origin", () => {
+    expect(
+      isSameOriginRequest(
+        headers({ origin: "http://localhost:3000", host: "localhost:3000" }),
+        url,
+      ),
+    ).toBe(true);
+  });
+
+  it("honors the forwarded host behind a proxy", () => {
+    expect(
+      isSameOriginRequest(
+        headers({
+          origin: "https://oscar.example",
+          host: "internal:3000",
+          "x-forwarded-host": "oscar.example",
+        }),
+        url,
+      ),
+    ).toBe(true);
+  });
+
+  it("rejects another site", () => {
+    expect(
+      isSameOriginRequest(headers({ origin: "https://evil.example", host: "localhost:3000" }), url),
+    ).toBe(false);
+    expect(isSameOriginRequest(headers({ origin: "null", host: "localhost:3000" }), url)).toBe(
+      false,
+    );
+  });
+
+  it("falls back to Sec-Fetch-Site and rejects requests with neither header", () => {
+    expect(
+      isSameOriginRequest(
+        headers({ "sec-fetch-site": "same-origin", host: "localhost:3000" }),
+        url,
+      ),
+    ).toBe(true);
+    expect(
+      isSameOriginRequest(headers({ "sec-fetch-site": "cross-site", host: "localhost:3000" }), url),
+    ).toBe(false);
+    expect(isSameOriginRequest(headers({ host: "localhost:3000" }), url)).toBe(false);
   });
 });

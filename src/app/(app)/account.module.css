@@ -1,0 +1,119 @@
+/* Profile and Settings: label column + content column, separated by hairlines. */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+  padding-top: var(--space-8);
+  border-top: var(--border-width) solid var(--color-border);
+}
+
+@media (min-width: 1024px) {
+  .section {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: var(--space-12);
+  }
+}
+
+.sectionIntro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sectionTitle {
+  font-size: var(--text-h4-size);
+  line-height: var(--text-h4-line);
+  letter-spacing: var(--text-h4-tracking);
+  font-weight: var(--font-weight-semibold);
+}
+
+.sectionText {
+  font-size: var(--text-small-size);
+  line-height: var(--text-small-line);
+  color: var(--color-foreground-muted);
+}
+
+.sectionText a,
+.links a {
+  color: var(--color-foreground);
+  font-weight: var(--font-weight-medium);
+  text-underline-offset: 0.2em;
+}
+
+.sectionBody {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-6);
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.identityName {
+  font-weight: var(--font-weight-semibold);
+  overflow-wrap: anywhere;
+}
+
+.identityEmail {
+  font-size: var(--text-small-size);
+  color: var(--color-foreground-muted);
+  overflow-wrap: anywhere;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0;
+}
+
+.details > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-1);
+  padding-block: var(--space-3);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+@media (min-width: 640px) {
+  .details > div {
+    grid-template-columns: 10rem minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+}
+
+.details > div:last-child {
+  border-bottom: 0;
+}
+
+.details dt {
+  font-size: var(--text-small-size);
+  color: var(--color-foreground-muted);
+}
+
+.details dd {
+  margin: 0;
+  font-size: var(--text-small-size);
+  overflow-wrap: anywhere;
+}
+
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-small-size);
+}

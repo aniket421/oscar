@@ -20,3 +20,11 @@ export const authCookieOptions: CookieOptionsWithName = {
 export function isAuthCookieName(name: string): boolean {
   return /^sb-.+-auth-token(\.\d+)?$/.test(name);
 }
+
+/**
+ * A cookie that deletes `name`: empty, already expired, same attributes as the
+ * original so the browser matches and removes it.
+ */
+export function expiredAuthCookie(name: string) {
+  return { ...authCookieOptions, name, value: "", maxAge: 0, expires: new Date(0) };
+}

@@ -4,7 +4,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
   return (
     <>
       <SiteHeader />
-      <main id="main">{children}</main>
+      <main id="content">{children}</main>
       <SiteFooter />
     </>
   );

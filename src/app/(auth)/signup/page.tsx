@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { AuthPanel, authRoutes, SignupForm } from "@/features/auth";
+import { AuthPanel, authRoutes, ResetOnHide, SignupForm } from "@/features/auth";
 
 import { SetupNotice } from "../setup-notice";
 
@@ -22,7 +22,9 @@ export default function SignupPage() {
       }
     >
       <SetupNotice />
-      <SignupForm />
+      <ResetOnHide>
+        <SignupForm />
+      </ResetOnHide>
     </AuthPanel>
   );
 }

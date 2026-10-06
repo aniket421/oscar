@@ -20,12 +20,16 @@ export {
 export { Checkbox, type CheckboxProps } from "./checkbox";
 export { Dialog, type DialogProps } from "./dialog";
 export { Divider, type DividerProps } from "./divider";
+export { Drawer, type DrawerProps } from "./drawer";
 export {
   DropdownMenu,
+  type DropdownMenuActionItem,
   type DropdownMenuItem,
+  type DropdownMenuLinkItem,
   type DropdownMenuProps,
   type DropdownTriggerProps,
 } from "./dropdown-menu";
+export { EmptyState, type EmptyStateProps } from "./empty-state";
 export { type FieldProps } from "./field";
 export { IconButton, type IconButtonProps } from "./icon-button";
 export { Input, type InputProps } from "./input";

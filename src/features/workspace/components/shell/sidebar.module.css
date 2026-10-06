@@ -1,0 +1,43 @@
+/* Wide screens only: the column carries the background, the content stays in view. */
+.sidebar {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .sidebar {
+    display: block;
+    border-right: var(--border-width) solid var(--color-border);
+    background-color: var(--color-background-subtle);
+  }
+}
+
+.inner {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  height: 100dvh;
+  padding: var(--space-5) var(--space-4) var(--space-6);
+  overflow-y: auto;
+}
+
+.brand {
+  display: inline-flex;
+  align-self: flex-start;
+  margin-inline: var(--space-3);
+  padding-block: var(--space-1-5);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+}
+
+.nav {
+  flex: 1;
+}
+
+.note {
+  padding-inline: var(--space-3);
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  color: var(--color-foreground-muted);
+}

@@ -1,6 +1,6 @@
 # Oscar Design System
 
-**Status:** Phase 1, extended in Phase 2 with page patterns (section 14). This document is the source of truth for every Oscar interface. If code and
+**Status:** Phase 1, extended in Phase 2 (page patterns, section 14) and Phase 3 (application shell, section 15). This document is the source of truth for every Oscar interface. If code and
 this document disagree, fix one of them in the same change.
 
 - Tokens: `src/styles/tokens.css`
@@ -233,6 +233,11 @@ Never: mascots, faces, robots, sparkles, or AI-provider marks and names.
 | `Heading`, `Text`                                      | Typography roles as components.                                                                                                                                                           |
 | `Spinner`                                              | Used by Button; label it when standalone.                                                                                                                                                 |
 | `Container`                                            | Max width + fluid gutters; `as="main"` or `"section"` for landmarks.                                                                                                                      |
+| `Drawer`                                               | Off-canvas modal on the native `<dialog>` (focus trap, Escape, inert page, focus return). `label`, `header`, `side`.                                                                      |
+| `EmptyState`                                           | What the area is (`description`), why it matters (`reason`), what is next (`next`), plus `action`. `section` or `page` size.                                                              |
+| `ErrorState`                                           | Plain-language failure with recovery `actions`; `role="alert"`. Never pass error messages or codes.                                                                                       |
+| `LoadingState`                                         | Compact announced loading message. Prefer a skeleton that mirrors the content.                                                                                                            |
+| `DropdownMenu` (Phase 3)                               | Items can be links (`href`, rendered as real `<a>`) or actions (`onSelect`); optional non-interactive `header`.                                                                           |
 
 Component rules:
 
@@ -342,3 +347,43 @@ confirmation) so every such state looks and reads the same.
 
 **Icons added in Phase 2:** `MenuIcon`, `DocumentIcon`, `CodeIcon`, `ConversationIcon`,
 `FeedbackIcon`, `RouteIcon`. Same 24px grid and 1.75 stroke as the rest of the set.
+
+## 15. Application shell patterns (Phase 3)
+
+**Frame.** From 1024px: a 16rem sidebar on `--color-background-subtle` with a hairline border, and
+the content column. Below 1024px: a top bar with a menu button that opens a `Drawer`. Content is
+capped at 68rem and uses the fluid gutter.
+
+**Navigation.** Grouped (Workspace, Preparation, Account) with small overline group labels and one
+line icon per item. The active item: surface background, hairline inset border, a 2px accent bar,
+accent icon, `aria-current="page"`. Rectangular items with `--radius-md`; never pills. A group
+whose capability is not available carries one small "Later" tag on its label, not on every item.
+
+**Header.** Context line ("Group / Area") on wide screens, the Start interview action from 640px,
+and the account menu (`ProfileMenu`: avatar, name, then Profile, Settings, Log out). The name is
+visually hidden below 640px but stays in the accessible name.
+
+**Page header.** Every workspace page starts with one `PageHeader`: overline eyebrow (the
+navigation group), optional status badge, H1 at the H2 size, lead description, optional actions.
+
+**Dashboard composition.** Not a grid of cards. Sections are separated by whitespace and a
+hairline (`DashboardSection`), in a 3:2 two-column layout from 1024px. One focal dark panel (the
+Start interview card) is the only raised surface. Lists use rows with hairlines.
+
+**Honest status, sparingly.** Say "not available yet" once per area: in the page header badge, a
+group's "Later" tag, or a sentence in the section. Do not repeat a badge on every row.
+
+**Empty states.** Use `EmptyState` (via `AreaEmptyState` and the reviewed copy in
+`features/workspace/content.ts`). Each one states what the area is, why it matters, and what is
+next. Section-size states use an icon tile and a text link; page-size states use Oscar's presence
+and an outline button.
+
+**Loading.** Skeletons that mirror the layout (`DashboardSkeleton`, `PageSkeleton`,
+`ContentSkeleton`), with `aria-busy` on the region and one visually hidden status message.
+
+**Errors.** `ErrorState` with "Try again" and "Go to overview". Nothing from the error object is
+shown.
+
+**Preserved pages.** Next.js keeps visited pages mounted but hidden. Forms that hold sensitive or
+one-time input (login, signup) are wrapped in `ResetOnHide`. Each shell's `<main>` has its own id
+(`content`, `workspace-main`) so skip links never target a hidden page.

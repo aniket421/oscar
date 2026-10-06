@@ -1,14 +1,12 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
 
 import { readEnv } from "@/lib/env";
-import { isAuthCookieName } from "@/server/supabase/cookies";
 import { createSupabaseServerClient } from "@/server/supabase/server-client";
 
 import { authMessages, describeAuthError, type AuthFailure } from "./errors";
-import { authRoutes, loginUrl, safeRedirectPath } from "./routes";
+import { authRoutes, safeRedirectPath } from "./routes";
 import {
   validateLogin,
   validateSignup,
@@ -70,7 +68,7 @@ export async function login(_previous: LoginState, form: FormData): Promise<Logi
       : { status: "error", message: failure.message };
   }
 
-  redirect(safeRedirectPath(form.get("next")) ?? authRoutes.app);
+  redirect(safeRedirectPath(form.get("next")) ?? authRoutes.home);
 }
 
 function siteOrigin(): string | undefined {
@@ -117,27 +115,7 @@ export async function signup(_previous: SignupState, form: FormData): Promise<Si
   }
 
   // Email confirmation disabled: the user is signed in immediately.
-  if (data.session) redirect(authRoutes.app);
+  if (data.session) redirect(authRoutes.home);
 
   return { status: "confirm_email", email };
-}
-
-export async function logout(): Promise<void> {
-  const supabase = await createSupabaseServerClient();
-  if (supabase) {
-    try {
-      const { error } = await supabase.auth.signOut({ scope: "local" });
-      if (error) logAuthError("logout", error);
-    } catch (error) {
-      logAuthError("logout", error);
-    }
-  }
-
-  // Always clear session cookies locally, even if the provider could not be reached.
-  const cookieStore = await cookies();
-  for (const { name } of cookieStore.getAll()) {
-    if (isAuthCookieName(name)) cookieStore.delete(name);
-  }
-
-  redirect(loginUrl({ notice: "signed_out" }));
 }

@@ -1,0 +1,67 @@
+/* Shared layout for dashboard sections: whitespace and dividers, not boxes. */
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-12);
+}
+
+@media (min-width: 1024px) {
+  .columns {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    gap: var(--space-16);
+  }
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding-top: var(--space-6);
+  border-top: var(--border-width) solid var(--color-border);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.sectionTitle {
+  font-size: var(--text-h4-size);
+  line-height: var(--text-h4-line);
+  letter-spacing: var(--text-h4-tracking);
+  font-weight: var(--font-weight-semibold);
+}
+
+.sectionLink {
+  flex-shrink: 0;
+  font-size: var(--text-small-size);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-foreground-muted);
+  text-underline-offset: 0.2em;
+}
+
+.sectionLink:hover {
+  color: var(--color-foreground);
+}
+
+.next {
+  font-size: var(--text-small-size);
+  line-height: var(--text-small-line);
+  color: var(--color-foreground-muted);
+}

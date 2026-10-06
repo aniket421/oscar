@@ -1,0 +1,26 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  height: var(--space-16);
+  padding-inline: var(--space-gutter);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.brand {
+  display: inline-flex;
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+}
+
+.main {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  padding: var(--space-12) var(--space-gutter);
+}

@@ -1,0 +1,68 @@
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--control-height-md);
+  padding: 0 var(--space-2) 0 var(--space-1);
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--color-foreground);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-standard);
+}
+
+.trigger:hover,
+.trigger[aria-expanded="true"] {
+  background-color: var(--color-interactive-hover);
+}
+
+.name {
+  overflow: hidden;
+  max-width: 10rem;
+  font-size: var(--text-small-size);
+  font-weight: var(--font-weight-medium);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Below 640px only the avatar shows; the name stays available to screen readers. */
+@media (max-width: 639.98px) {
+  .name {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    border: 0;
+  }
+}
+
+.chevron {
+  color: var(--color-foreground-muted);
+}
+
+.identity {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5);
+  min-width: 0;
+}
+
+.identityName {
+  overflow: hidden;
+  font-size: var(--text-small-size);
+  font-weight: var(--font-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.identityEmail {
+  overflow: hidden;
+  font-size: var(--text-caption-size);
+  color: var(--color-foreground-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

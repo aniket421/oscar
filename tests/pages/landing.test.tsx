@@ -90,7 +90,10 @@ describe("SiteHeader", () => {
       "/#how-it-works",
     );
     expect(screen.getByRole("link", { name: "Get started" })).toHaveAttribute("href", "/signup");
-    expect(screen.getByRole("link", { name: "Skip to content" })).toHaveAttribute("href", "#main");
+    expect(screen.getByRole("link", { name: "Skip to content" })).toHaveAttribute(
+      "href",
+      "#content",
+    );
   });
 
   it("opens the mobile menu, closes it with Escape, and returns focus", async () => {

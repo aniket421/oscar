@@ -3,9 +3,10 @@
 Oscar is an AI interview coach in development. This repository is its web application, built on
 Next.js (App Router) and TypeScript.
 
-> **Status: Phase 2 complete.** Foundation (Phase 0), design system (Phase 1), and now the public
-> landing page, legal pages, and email + password authentication with a protected placeholder
-> workspace. Interview, resume, and evaluation features are not built yet.
+> **Status: Phase 3 complete.** Foundation (Phase 0), design system (Phase 1), landing page and
+> authentication (Phase 2), and now the signed-in application shell: sidebar and mobile
+> navigation, account menu, dashboard, and every workspace area with designed empty states.
+> Interview, resume, roadmap, and practice features are not built yet, and the UI says so.
 
 ## Tech stack
 
@@ -49,8 +50,9 @@ npm run dev                   # http://localhost:3000
 Without these values the site still runs: marketing pages work, the auth pages show a setup notice
 in development, and sign-in reports "temporarily unavailable" in production.
 
-Useful URLs: `/` (landing), `/login`, `/signup`, `/app` (signed-in placeholder),
-`/design-system` (development only), `/api/health` (returns `{"status":"ok"}`).
+Useful URLs: `/` (landing), `/login`, `/signup`, `/dashboard` (signed-in workspace; also
+`/interviews`, `/resume`, `/roadmap`, `/practice/*`, `/profile`, `/settings`), `/design-system`
+(development only), `/api/health` (returns `{"status":"ok"}`).
 
 ## Scripts
 
@@ -86,16 +88,18 @@ PLAYWRIGHT_CHROMIUM_EXECUTABLE=/path/to/chromium npm run test:e2e
 .
 ├── docs/                    Architecture, design system, development rules, QA checklists
 ├── src/
-│   ├── app/                 Routes only: (marketing), (auth), (app), auth/confirm, design-system
+│   ├── app/                 Routes only: (marketing), (auth), (app) workspace, auth/*, design-system
 │   ├── components/          Shared UI: ui/, oscar/, layout/, icons/
 │   ├── config/              Static, non-secret app configuration
 │   ├── features/
 │   │   ├── auth/            Validation, errors, route policy, actions, forms, session DAL
+│   │   ├── workspace/       App shell, navigation, dashboard, area pages, data loading
 │   │   ├── marketing/       Landing page sections and copy
 │   │   └── legal/           Privacy Policy, Terms, contact configuration
 │   ├── lib/                 Framework-agnostic utilities
 │   ├── server/supabase/     Server-only Supabase adapters
 │   ├── styles/              Design tokens, typography roles, motion utilities
+│   ├── types/domain.ts      Domain model (profile, interviews, resume, roadmap, practice)
 │   └── proxy.ts             Session refresh and route guard
 └── tests/                   Vitest suites and Playwright e2e (tests/e2e)
 ```
@@ -109,7 +113,7 @@ authentication design.
 - [Design system](docs/design-system.md) (source of truth for all UI)
 - [Development rules](docs/development-rules.md)
 - QA checklists: [Phase 0](docs/qa/phase-0.md), [Phase 1](docs/qa/phase-1.md),
-  [Phase 2](docs/qa/phase-2.md)
+  [Phase 2](docs/qa/phase-2.md), [Phase 3](docs/qa/phase-3.md)
 
 ## Environment variables
 

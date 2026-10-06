@@ -7,12 +7,25 @@ export const authRoutes = {
   login: "/login",
   signup: "/signup",
   confirm: "/auth/confirm",
-  /** Default destination after signing in. */
-  app: "/app",
+  /** Plain form POST target; responds with a full-page redirect so no client state survives. */
+  logout: "/auth/logout",
+  /** Default destination after signing in: the workspace overview. */
+  home: "/dashboard",
 } as const;
 
-/** URL prefixes that require a signed-in user. */
-export const protectedPrefixes = ["/app"] as const;
+/**
+ * URL prefixes that require a signed-in user. This list is the single source of
+ * truth for the proxy matcher (kept in sync by a test) and for redirect safety.
+ */
+export const protectedPrefixes = [
+  "/dashboard",
+  "/interviews",
+  "/resume",
+  "/roadmap",
+  "/practice",
+  "/profile",
+  "/settings",
+] as const;
 /** Pages that signed-in users do not need to see. */
 export const guestOnlyPaths = [authRoutes.login, authRoutes.signup] as const;
 
@@ -56,7 +69,7 @@ export function safeRedirectPath(value: unknown): string | undefined {
 export function loginUrl(options: { next?: string; notice?: AuthNotice } = {}): string {
   const params = new URLSearchParams();
   const next = safeRedirectPath(options.next);
-  if (next && next !== authRoutes.app) params.set("next", next);
+  if (next && next !== authRoutes.home) params.set("next", next);
   if (options.notice) params.set("notice", options.notice);
   const query = params.toString();
   return query ? `${authRoutes.login}?${query}` : authRoutes.login;
@@ -88,8 +101,26 @@ export function decideRouteAccess(context: RouteContext): RouteDecision {
   }
 
   if (isGuestOnlyPath(pathname) && isAuthenticated) {
-    return { type: "redirect", location: safeRedirectPath(context.next) ?? authRoutes.app };
+    return { type: "redirect", location: safeRedirectPath(context.next) ?? authRoutes.home };
   }
 
   return { type: "allow" };
+}
+
+/**
+ * True when a state-changing request comes from this site. Browsers send
+ * `Origin` on form POSTs; `Sec-Fetch-Site` is the fallback. Requests with
+ * neither are rejected.
+ */
+export function isSameOriginRequest(headers: Headers, requestUrl: string): boolean {
+  const host = headers.get("x-forwarded-host") ?? headers.get("host") ?? new URL(requestUrl).host;
+  const origin = headers.get("origin");
+  if (origin) {
+    try {
+      return new URL(origin).host === host;
+    } catch {
+      return false;
+    }
+  }
+  return headers.get("sec-fetch-site") === "same-origin";
 }

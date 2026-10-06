@@ -28,9 +28,7 @@ export function AuthShell({ children }: { children: ReactNode }) {
             <OscarWordmark />
           </Link>
         </header>
-        <main className={styles.main} id="main">
-          {children}
-        </main>
+        <main className={styles.main}>{children}</main>
         <footer className={styles.footer}>
           <Link href="/privacy">Privacy Policy</Link>
           <Link href="/terms">Terms &amp; Conditions</Link>

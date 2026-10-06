@@ -10,6 +10,7 @@ vi.mock("@supabase/ssr", () => ({
 }));
 
 const { config, proxy } = await import("@/proxy");
+const { protectedPrefixes } = await import("@/features/auth/routes");
 const { isAuthCookieName } = await import("@/server/supabase/cookies");
 
 beforeEach(() => {
@@ -33,11 +34,16 @@ function request(path: string, cookie?: string) {
 }
 
 describe("proxy matcher", () => {
-  it.each(["/app", "/app/reports", "/login", "/signup"])("runs on %s", (url) => {
+  it.each(["/login", "/signup", "/interviews/new", "/practice/coding"])("runs on %s", (url) => {
     expect(unstable_doesMiddlewareMatch({ config, url })).toBe(true);
   });
 
-  it.each(["/", "/privacy", "/terms", "/api/health", "/_next/static/chunk.js", "/apple"])(
+  it.each(protectedPrefixes)("covers every protected area: %s and its children", (prefix) => {
+    expect(unstable_doesMiddlewareMatch({ config, url: prefix })).toBe(true);
+    expect(unstable_doesMiddlewareMatch({ config, url: `${prefix}/nested/page` })).toBe(true);
+  });
+
+  it.each(["/", "/privacy", "/terms", "/api/health", "/_next/static/chunk.js", "/dashboards"])(
     "skips %s",
     (url) => {
       expect(unstable_doesMiddlewareMatch({ config, url })).toBe(false);
@@ -48,10 +54,10 @@ describe("proxy matcher", () => {
 describe("proxy", () => {
   it("redirects anonymous visitors from the workspace to login without calling the provider", async () => {
     configure();
-    const response = await proxy(request("/app/reports?id=2"));
+    const response = await proxy(request("/interviews/new?id=2"));
     expect(response.status).toBe(307);
     expect(response.headers.get("location")).toBe(
-      "http://localhost:3000/login?next=%2Fapp%2Freports%3Fid%3D2",
+      "http://localhost:3000/login?next=%2Finterviews%2Fnew%3Fid%3D2",
     );
     expect(getUser).not.toHaveBeenCalled();
   });
@@ -59,7 +65,7 @@ describe("proxy", () => {
   it("lets a verified user through", async () => {
     configure();
     getUser.mockResolvedValue({ data: { user: { id: "u1" } }, error: null });
-    const response = await proxy(request("/app", "sb-proj-auth-token=valid"));
+    const response = await proxy(request("/dashboard", "sb-proj-auth-token=valid"));
     expect(response.headers.get("location")).toBeNull();
   });
 
@@ -67,7 +73,7 @@ describe("proxy", () => {
     configure();
     getUser.mockResolvedValue({ data: { user: { id: "u1" } }, error: null });
     const response = await proxy(request("/login", "sb-proj-auth-token=valid"));
-    expect(response.headers.get("location")).toBe("http://localhost:3000/app");
+    expect(response.headers.get("location")).toBe("http://localhost:3000/dashboard");
   });
 
   it("explains a rejected session and clears its cookies", async () => {
@@ -76,13 +82,16 @@ describe("proxy", () => {
       data: { user: null },
       error: { name: "AuthApiError", status: 403, code: "session_not_found" },
     });
-    const response = await proxy(request("/app", "sb-proj-auth-token=stale; theme=dark"));
+    const response = await proxy(request("/dashboard", "sb-proj-auth-token=stale; theme=dark"));
     expect(response.headers.get("location")).toBe(
       "http://localhost:3000/login?notice=session_expired",
     );
     const cleared = response.cookies.get("sb-proj-auth-token");
     expect(cleared?.value).toBe("");
     expect(cleared?.httpOnly).toBe(true);
+    // Must actually expire, not become an empty session cookie.
+    expect(cleared?.maxAge).toBe(0);
+    expect(response.headers.get("set-cookie")).toMatch(/Expires=Thu, 01 Jan 1970/);
     expect(response.cookies.get("theme")).toBeUndefined();
   });
 
@@ -92,13 +101,13 @@ describe("proxy", () => {
       data: { user: null },
       error: { name: "AuthRetryableFetchError", status: 0 },
     });
-    const response = await proxy(request("/app", "sb-proj-auth-token=valid"));
+    const response = await proxy(request("/dashboard", "sb-proj-auth-token=valid"));
     expect(response.headers.get("location")).toBe("http://localhost:3000/login");
     expect(response.cookies.get("sb-proj-auth-token")).toBeUndefined();
   });
 
   it("denies protected pages when authentication is not configured", async () => {
-    const response = await proxy(request("/app", "sb-proj-auth-token=valid"));
+    const response = await proxy(request("/dashboard", "sb-proj-auth-token=valid"));
     expect(response.headers.get("location")).toBe("http://localhost:3000/login");
     expect(getUser).not.toHaveBeenCalled();
   });

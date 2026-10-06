@@ -15,6 +15,13 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
+  async redirects() {
+    // Phase 2's placeholder workspace moved to /dashboard in Phase 3.
+    return [
+      { source: "/app", destination: "/dashboard", permanent: true },
+      { source: "/app/:path*", destination: "/dashboard", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;

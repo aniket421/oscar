@@ -1,0 +1,23 @@
+.mobile {
+  display: flex;
+}
+
+@media (min-width: 1024px) {
+  .mobile {
+    display: none;
+  }
+}
+
+.brand {
+  display: inline-flex;
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+}
+
+.nav {
+  padding-bottom: var(--space-6);
+}
+
+.start {
+  margin-top: var(--space-2);
+}

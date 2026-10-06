@@ -1,0 +1,82 @@
+.drawer {
+  position: fixed;
+  inset-block: 0;
+  width: min(20rem, calc(100vw - var(--space-12)));
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background-color: var(--color-surface-elevated);
+  color: var(--color-foreground);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.start {
+  inset-inline-start: 0;
+  inset-inline-end: auto;
+  border-inline-end: var(--border-width) solid var(--color-border);
+}
+
+.end {
+  inset-inline-end: 0;
+  inset-inline-start: auto;
+  border-inline-start: var(--border-width) solid var(--color-border);
+}
+
+.drawer::backdrop {
+  background-color: var(--color-overlay);
+}
+
+.drawer[open] {
+  transform: translateX(0);
+  transition: transform var(--duration-standard) var(--ease-out);
+}
+
+.drawer[open]::backdrop {
+  opacity: 1;
+  transition: opacity var(--duration-standard) var(--ease-out);
+}
+
+@starting-style {
+  .start[open] {
+    transform: translateX(-100%);
+  }
+
+  .end[open] {
+    transform: translateX(100%);
+  }
+
+  .drawer[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  height: var(--space-16);
+  padding-inline: var(--space-4) var(--space-3);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.headerContent {
+  min-width: 0;
+}
+
+.body {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--space-4);
+}

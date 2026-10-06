@@ -8,6 +8,7 @@ Anything not written here has **not** been decided yet.
 | 0     | Foundation: tooling, structure, docs      | Complete |
 | 1     | Design system and reusable UI foundation  | Complete |
 | 2     | Landing page, legal pages, authentication | Complete |
+| 3     | Application shell and dashboard           | Complete |
 
 ## 1. Goals
 
@@ -39,20 +40,24 @@ src/
 ├── app/                 Routing only: pages, layouts, route handlers. Thin.
 │   ├── (marketing)/     Public pages with site header/footer: /, /privacy, /terms, /contact
 │   ├── (auth)/          /login, /signup (split-screen auth layout)
-│   ├── (app)/           Signed-in area: /app (protected placeholder)
+│   ├── (app)/           Signed-in workspace: /dashboard, /interviews, /resume, /roadmap,
+│   │                    /practice/*, /profile, /settings (+ loading.tsx, error.tsx)
 │   ├── auth/confirm/    Email confirmation route handler
+│   ├── auth/logout/     Logout route handler (plain form POST, full page reload)
+│   └── not-found.tsx    Designed 404
 │   └── design-system/   Development-only component playground
 ├── components/          Shared, presentation-only components (ui, oscar, layout, icons)
 ├── features/            Product domains, one folder each
 │   ├── auth/            Validation, error mapping, route policy, actions, forms, session DAL
+│   ├── workspace/       App shell, navigation, dashboard, area pages, data loading (snapshot)
 │   ├── marketing/       Landing page sections, header, footer, and their copy (content.ts)
 │   └── legal/           Privacy Policy, Terms, contact configuration
 ├── server/              Server-only adapters to external systems
-│   └── supabase/        Config, cookie policy, request client, proxy session refresh
+│   └── supabase/        Config, cookie policy, request client, proxy session refresh, sign-out
 ├── styles/              Design tokens, typography roles, motion utilities
 ├── config/              Static, non-secret configuration (site name, metadata)
 ├── lib/                 Pure utilities (env access, class names, motion constants)
-├── types/               Shared cross-feature types
+├── types/               Shared cross-feature types (domain.ts: Oscar's domain model)
 └── proxy.ts             Next.js Proxy (formerly middleware): session refresh + route guard
 tests/
 ├── unit/, components/, features/, server/, pages/, design-system/   Vitest (jsdom or node)
@@ -121,17 +126,28 @@ All variables are listed in `.env.example` with empty placeholders.
 
 ## 6. Routes
 
-| Route                            | Rendering         | Access                                            | Purpose                                          |
-| -------------------------------- | ----------------- | ------------------------------------------------- | ------------------------------------------------ |
-| `/`                              | Static            | Public                                            | Landing page                                     |
-| `/privacy`, `/terms`, `/contact` | Static            | Public                                            | Legal and contact pages                          |
-| `/login`                         | Partial prerender | Guests (signed-in users are redirected to `/app`) | Log in                                           |
-| `/signup`                        | Static            | Guests (signed-in users are redirected to `/app`) | Create an account                                |
-| `/app`                           | Partial prerender | Signed-in users                                   | Protected placeholder for the future workspace   |
-| `/auth/confirm`                  | Dynamic           | Public                                            | Email confirmation (PKCE `code` or `token_hash`) |
-| `/api/health`                    | Static            | Public                                            | Liveness probe                                   |
-| `/design-system`                 | Static            | Development only (404 in production)              | Component playground                             |
-| `/robots.txt`                    | Static            | Public                                            | Disallows `/app`, `/auth/`, `/design-system`     |
+| Route                                                             | Rendering           | Access                                      | Purpose                                                     |
+| ----------------------------------------------------------------- | ------------------- | ------------------------------------------- | ----------------------------------------------------------- |
+| `/`                                                               | Static              | Public                                      | Landing page                                                |
+| `/privacy`, `/terms`, `/contact`                                  | Static              | Public                                      | Legal and contact pages                                     |
+| `/login`                                                          | Partial prerender   | Guests (signed-in users go to `/dashboard`) | Log in                                                      |
+| `/signup`                                                         | Static              | Guests (signed-in users go to `/dashboard`) | Create an account                                           |
+| `/dashboard`                                                      | Partial prerender   | Signed-in users                             | Workspace overview                                          |
+| `/interviews`, `/interviews/new`                                  | Partial prerender   | Signed-in users                             | Interview history; interview setup placeholder              |
+| `/resume`, `/roadmap`                                             | Partial prerender   | Signed-in users                             | Area pages (empty states until their phases)                |
+| `/practice/technical`, `/practice/behavioral`, `/practice/coding` | Partial prerender   | Signed-in users                             | Practice areas (empty states until their phases)            |
+| `/profile`, `/settings`                                           | Partial prerender   | Signed-in users                             | Account details, session, privacy links                     |
+| `/app`, `/app/*`                                                  | Redirect (308)      | -                                           | Phase 2 placeholder address, now `/dashboard`               |
+| `/auth/confirm`                                                   | Dynamic             | Public                                      | Email confirmation (PKCE `code` or `token_hash`)            |
+| `/auth/logout`                                                    | Dynamic (POST only) | Same-origin form POST                       | Ends the session; 303 to `/login` with a full page load     |
+| `/api/health`                                                     | Static              | Public                                      | Liveness probe                                              |
+| `/design-system`                                                  | Static              | Development only (404 in production)        | Component playground                                        |
+| `/robots.txt`                                                     | Static              | Public                                      | Disallows the workspace, `/app`, `/auth/`, `/design-system` |
+| anything else                                                     | Static              | Public                                      | Designed 404 page                                           |
+
+Workspace pages prerender a static shell (navigation, page header) that contains no user data; the
+user's data streams in behind `<Suspense>` after the page verifies the session. Authenticated
+responses are sent with `Cache-Control: private, no-store`.
 
 All responses carry baseline security headers (`X-Content-Type-Options`, `X-Frame-Options: DENY`,
 `Referrer-Policy`, `Permissions-Policy` denying camera, microphone, geolocation). The voice/video
@@ -154,24 +170,26 @@ are configured, and none are shown in the UI.
 Browser ──form POST──▶ Server Action (login/signup/logout) ──▶ Supabase Auth
    ▲                         │ sets httpOnly session cookies
    │                         ▼
-   └──── redirect ◀──── /app ◀── proxy.ts (refresh + guard) ◀── Supabase Auth (getUser)
+   └──── redirect ◀── /dashboard ◀── proxy.ts (refresh + guard) ◀── Supabase Auth (getUser)
                             └── requireUser() in the page (DAL, authoritative)
 ```
 
-| Concern                       | Implementation                                                                                                                                         |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Credentials                   | Sent only to Server Actions; passed to Supabase; never stored or logged by Oscar                                                                       |
-| Validation                    | `features/auth/validation.ts`, shared by the browser (instant feedback) and Server Actions (authoritative)                                             |
-| Session storage               | Supabase session in `sb-<project>-auth-token` cookies: **httpOnly**, `SameSite=Lax`, `Secure` in production                                            |
-| Session refresh               | `src/proxy.ts` runs on `/app/*`, `/login`, `/signup`; refreshes tokens and writes cookies                                                              |
-| Route guard (optimistic)      | Proxy: anonymous users on `/app/*` go to `/login?next=…`; signed-in users on `/login`/`/signup` go to `/app`                                           |
-| Authorization (authoritative) | `requireUser()` / `getCurrentUser()` in `features/auth/session.ts` (Data Access Layer) verify the user with `supabase.auth.getUser()` on every request |
-| Expired/revoked sessions      | Proxy clears the cookies and redirects to `/login?notice=session_expired`                                                                              |
-| Provider outage               | Proxy denies protected pages but keeps the cookies, so the session survives the outage                                                                 |
-| Open redirects                | `safeRedirectPath()` only accepts same-origin paths inside `/app`                                                                                      |
-| Errors                        | `describeAuthError()` maps provider codes to fixed, user-safe messages; logs carry only error name, status, and code                                   |
-| Email confirmation            | `signUp` sets `emailRedirectTo` to `/auth/confirm`; the route handles PKCE `code` and `token_hash` links                                               |
-| Logout                        | Form POST to a Server Action; `signOut({ scope: "local" })`, then session cookies are deleted even if the provider is unreachable                      |
+| Concern                       | Implementation                                                                                                                                                                                                                           |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Credentials                   | Sent only to Server Actions; passed to Supabase; never stored or logged by Oscar                                                                                                                                                         |
+| Validation                    | `features/auth/validation.ts`, shared by the browser (instant feedback) and Server Actions (authoritative)                                                                                                                               |
+| Session storage               | Supabase session in `sb-<project>-auth-token` cookies: **httpOnly**, `SameSite=Lax`, `Secure` in production                                                                                                                              |
+| Session refresh               | `src/proxy.ts` runs on every protected area plus `/login` and `/signup`; refreshes tokens and writes cookies                                                                                                                             |
+| Route guard (optimistic)      | Proxy: anonymous users on protected areas go to `/login?next=…`; signed-in users on `/login`/`/signup` go to `/dashboard`                                                                                                                |
+| Authorization (authoritative) | `requireUser()` / `getCurrentUser()` in `features/auth/session.ts` (Data Access Layer) verify the user with `supabase.auth.getUser()` on every request                                                                                   |
+| Expired/revoked sessions      | Proxy clears the cookies and redirects to `/login?notice=session_expired`                                                                                                                                                                |
+| Provider outage               | Proxy denies protected pages but keeps the cookies, so the session survives the outage                                                                                                                                                   |
+| Open redirects                | `safeRedirectPath()` only accepts same-origin paths inside the protected areas                                                                                                                                                           |
+| Errors                        | `describeAuthError()` maps provider codes to fixed, user-safe messages; logs carry only error name, status, and code                                                                                                                     |
+| Email confirmation            | `signUp` sets `emailRedirectTo` to `/auth/confirm`; the route handles PKCE `code` and `token_hash` links                                                                                                                                 |
+| Logout                        | Plain form POST to `/auth/logout` (same-origin check): `signOut({ scope: "local" })`, session cookies expired on the response even if the provider is unreachable, then a 303 to `/login` that the browser follows with a full page load |
+| Protected areas               | `protectedPrefixes` in `features/auth/routes.ts` is the single list; a test keeps the proxy matcher in sync with it                                                                                                                      |
+| Hidden pages (Activity)       | Auth forms are wrapped in `ResetOnHide`, so a hidden login page never keeps a typed password or a stale error                                                                                                                            |
 
 Why `getUser()` and not `getClaims()`: it asks Supabase Auth to validate the token, so revoked
 sessions are caught immediately. It costs one request per protected navigation; the proxy only runs
@@ -186,10 +204,51 @@ on auth-relevant routes, so marketing pages stay static. Revisit when traffic gr
 - Password policy: Oscar enforces at least 8 characters with a letter and a number; Supabase may
   enforce more (weak and breached passwords are reported to the user).
 
-## 9. Deferred decisions
+### Phase 3 changes to authentication (and why)
+
+| Change                                                                                                 | Reason                                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Default destination `/app` → `/dashboard`; `/app` redirects                                            | The workspace now has real routes; old links keep working                                                                                                                                                                                                                                  |
+| Logout moved from a Server Action to a plain POST route handler                                        | Next.js keeps visited pages mounted but hidden (React `<Activity>`). A Server Action redirect is a client navigation, so the previous user's pages, with their name and email, stayed in the DOM after logout. A plain form POST ends with a full page load, which clears all client state |
+| Session cookies are expired with `Max-Age=0` and `Expires` in the past, written on the response itself | Writing through `cookies()` in a Route Handler let a later merge drop the expiry, leaving an empty session cookie instead of deleting it                                                                                                                                                   |
+| `ResetOnHide` around the login and signup forms                                                        | A hidden login page could otherwise keep a typed password and a stale error message                                                                                                                                                                                                        |
+| `AuthUser.createdAt`                                                                                   | Shown as "member since" on the profile page                                                                                                                                                                                                                                                |
+
+## 9. Workspace (Phase 3)
+
+```
+(app)/layout.tsx ── DashboardShell
+                     ├── Sidebar (≥ 1024px): grouped NavList, aria-current on the active page
+                     ├── AppHeader: MobileNavigation (< 1024px, modal Drawer), context line,
+                     │              Start interview, ProfileMenu (Profile, Settings, Log out)
+                     └── <main id="workspace-main"> page content
+page.tsx ── PageHeader (static) + <Suspense> ── getWorkspaceSnapshot(path)
+                                                 ├── requireUser(path)  (verifies the session)
+                                                 └── loadWorkspaceSnapshot(user, source)
+```
+
+- **Navigation** is data (`features/workspace/navigation.ts`); every href is a protected route
+  (tested).
+- **Data model**: `src/types/domain.ts` defines `UserProfile`, `Interview`, `InterviewConfig`,
+  `InterviewSession`, `InterviewTurn`, `Resume`, `Skill`, `Roadmap`, `RoadmapStep`, and
+  `PracticeSession`. No score fields: the evaluation model is still an open decision.
+- **Data access**: pages depend only on `WorkspaceDataSource`. The current implementation,
+  `unconnectedDataSource`, truthfully returns no data because no storage exists yet. The database
+  phase replaces it behind the same interface. Every query takes the verified user's id.
+- **Availability flags** (`features/workspace/availability.ts`): every capability is `false` in
+  Phase 3. The UI reads these to label areas ("Later", "Available later", "In development")
+  instead of faking functionality. Each later phase flips its own flag.
+- **Derived state only**: the preparation path is computed from stored records
+  (`derivePreparationSteps`). With no data, every step is "Not started".
+- **States**: route-level `loading.tsx` (skeleton) and `error.tsx` (plain-language error, retry,
+  link to overview; never shows error details); per-region skeletons inside each Suspense boundary.
+- **Notifications**: not built. There is nothing real to notify about yet; a notification
+  foundation will be added with the first feature that produces events.
+
+## 10. Deferred decisions
 
 Hosting/deployment target, CI provider, a nonce-based Content Security Policy, password reset,
-OAuth providers, account deletion UI, automated accessibility checks in CI (axe), final logo and
+OAuth providers, account deletion UI, profile editing, notifications, the database schema, automated accessibility checks in CI (axe), final logo and
 brand assets, logging and error monitoring, i18n, and legal review of the Privacy Policy and Terms
 (operating entity, governing law, minimum age). Each is added when the phase that needs it begins,
 and recorded here.

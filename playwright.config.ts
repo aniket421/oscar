@@ -39,7 +39,7 @@ export default defineConfig({
     {
       name: "mobile",
       use: { ...devices["Pixel 7"], browserName: "chromium" },
-      testMatch: "**/responsive.spec.ts",
+      testMatch: ["**/responsive.spec.ts", "**/workspace-mobile.spec.ts"],
     },
   ],
   webServer: [

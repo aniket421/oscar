@@ -5,7 +5,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import { getSupabaseConfig } from "./config";
-import { authCookieOptions, isAuthCookieName } from "./cookies";
+import { authCookieOptions, expiredAuthCookie, isAuthCookieName } from "./cookies";
 
 export interface ProxySession {
   isAuthenticated: boolean;
@@ -68,7 +68,7 @@ export async function updateProxySession(request: NextRequest): Promise<ProxySes
     // The session could not be verified: clear it so the browser stops sending it.
     for (const { name } of request.cookies.getAll()) {
       if (isAuthCookieName(name)) {
-        response.cookies.set(name, "", { ...authCookieOptions, maxAge: 0 });
+        response.cookies.set(expiredAuthCookie(name));
       }
     }
   }

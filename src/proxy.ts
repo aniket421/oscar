@@ -6,7 +6,7 @@ import { updateProxySession } from "@/server/supabase/proxy-session";
 
 /**
  * Optimistic route guard and session refresher. Pages in the signed-in area
- * still verify the user themselves (see `src/server/auth/session.ts`); the
+ * still verify the user themselves (see `src/features/auth/session.ts`); the
  * proxy is a first line of defense, not the only one.
  */
 export async function proxy(request: NextRequest) {
@@ -26,6 +26,17 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Only routes whose access depends on the session. Marketing pages stay static.
-  matcher: ["/app/:path*", "/login", "/signup"],
+  // Only routes whose access depends on the session; marketing pages stay static.
+  // Must list every entry in `protectedPrefixes` (a unit test enforces this).
+  matcher: [
+    "/dashboard/:path*",
+    "/interviews/:path*",
+    "/resume/:path*",
+    "/roadmap/:path*",
+    "/practice/:path*",
+    "/profile/:path*",
+    "/settings/:path*",
+    "/login",
+    "/signup",
+  ],
 };

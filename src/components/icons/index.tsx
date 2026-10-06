@@ -164,3 +164,42 @@ export function RouteIcon(props: IconProps) {
     </Icon>
   );
 }
+
+export function OverviewIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <rect x="4" y="4" width="7" height="7" rx="1.5" />
+      <rect x="13" y="4" width="7" height="4" rx="1.5" />
+      <rect x="13" y="10" width="7" height="10" rx="1.5" />
+      <rect x="4" y="13" width="7" height="7" rx="1.5" />
+    </Icon>
+  );
+}
+
+export function TerminalIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <rect x="3" y="4.5" width="18" height="15" rx="2" />
+      <path d="M7.5 10l2.5 2-2.5 2M12.5 15h4" />
+    </Icon>
+  );
+}
+
+export function UserIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <circle cx="12" cy="8.5" r="3.5" />
+      <path d="M5 20a7 7 0 0114 0" />
+    </Icon>
+  );
+}
+
+export function SlidersIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M4 7h10M18 7h2M4 17h4M12 17h8" />
+      <circle cx="16" cy="7" r="2" />
+      <circle cx="10" cy="17" r="2" />
+    </Icon>
+  );
+}

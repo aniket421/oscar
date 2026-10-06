@@ -62,32 +62,46 @@ These rules apply to every change in Oscar 2.0, by humans and AI agents alike.
 23. Show users the messages from `describeAuthError()`, never raw provider errors. Log only error
     name, status, and code.
 24. Accept redirect targets only through `safeRedirectPath()`.
+25. Add every new signed-in area to `protectedPrefixes` and the proxy matcher (a test enforces
+    that they match). Workspace pages load data only through `getWorkspaceSnapshot()`, which
+    verifies the user first.
+26. Logout must end with a full page load (the `/auth/logout` POST), so no client state from the
+    session survives. Forms holding passwords or other one-time sensitive input use `ResetOnHide`.
+
+## Workspace data
+
+27. Never fabricate records, progress, scores, or activity to fill the UI. Show stored data or a
+    designed empty state. Test fixtures live in `tests/fixtures` and are labelled.
+28. Derive status from stored records (for example `derivePreparationSteps`), never from
+    assumptions.
+29. When a capability ships, flip its flag in `features/workspace/availability.ts` and remove the
+    "later" labels it controlled in the same change.
 
 ## TypeScript
 
-25. Strict mode stays on. Do not weaken `tsconfig.json` flags to make code compile.
-26. No `any`. Use `unknown` and narrow. No `@ts-ignore`; `@ts-expect-error` only with a comment
+30. Strict mode stays on. Do not weaken `tsconfig.json` flags to make code compile.
+31. No `any`. Use `unknown` and narrow. No `@ts-ignore`; `@ts-expect-error` only with a comment
     explaining why.
-27. Use `import type` for type-only imports.
+32. Use `import type` for type-only imports.
 
 ## Quality gates
 
-28. Before every commit/PR, `npm run check` must pass (typecheck, lint with zero warnings,
+33. Before every commit/PR, `npm run check` must pass (typecheck, lint with zero warnings,
     format check, tests, production build). Changes to routes, authentication, or page behavior
     must also pass `npm run test:e2e`.
-29. New logic ships with unit tests. Bug fixes ship with a test that would have caught the bug.
-30. Never skip, disable, or delete a failing test to get green — fix the cause.
-31. Do not disable lint rules inline without a comment explaining why.
+34. New logic ships with unit tests. Bug fixes ship with a test that would have caught the bug.
+35. Never skip, disable, or delete a failing test to get green — fix the cause.
+36. Do not disable lint rules inline without a comment explaining why.
 
 ## Git
 
-32. Small, focused commits with descriptive messages in the imperative mood.
-33. Never commit generated output (`.next/`, `coverage/`, `node_modules/`, `*.tsbuildinfo`).
-34. Lockfile changes are committed together with the `package.json` change that caused them.
+37. Small, focused commits with descriptive messages in the imperative mood.
+38. Never commit generated output (`.next/`, `coverage/`, `node_modules/`, `*.tsbuildinfo`).
+39. Lockfile changes are committed together with the `package.json` change that caused them.
 
 ## Documentation
 
-35. Each phase has a QA checklist in `docs/qa/phase-N.md` that must be completed before the phase
+40. Each phase has a QA checklist in `docs/qa/phase-N.md` that must be completed before the phase
     is declared done.
-36. Update `README.md` and `docs/architecture.md` in the same change that alters setup, scripts,
+41. Update `README.md` and `docs/architecture.md` in the same change that alters setup, scripts,
     structure, or architecture.

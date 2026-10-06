@@ -54,9 +54,11 @@ test.describe("login", () => {
     const assertNoErrors = trackConsoleErrors(page);
     await createUser();
     await logIn(page);
-    await expect(page).toHaveURL("/app");
+    await expect(page).toHaveURL("/dashboard");
     await expect(page.getByRole("heading", { level: 1, name: "Welcome, Test" })).toBeVisible();
-    await expect(page.getByText(`You are signed in as ${testUser.email}.`)).toBeVisible();
+    await page.getByRole("button", { name: /Account menu for/ }).click();
+    await expect(page.getByRole("menu", { name: "Account" })).toBeVisible();
+    await expect(page.getByText(testUser.email)).toBeVisible();
 
     const sessionCookies = (await context.cookies()).filter((cookie) =>
       cookie.name.startsWith("sb-"),
@@ -71,12 +73,12 @@ test.describe("login", () => {
 
   test("returns to the requested page after logging in", async ({ page }) => {
     await createUser();
-    await page.goto("/app?from=email");
-    await expect(page).toHaveURL(/\/login\?next=%2Fapp%3Ffrom%3Demail$/);
+    await page.goto("/interviews?from=email");
+    await expect(page).toHaveURL(/\/login\?next=%2Finterviews%3Ffrom%3Demail$/);
     await page.getByLabel("Email").fill(testUser.email);
     await page.getByLabel("Password").fill(testUser.password);
     await page.getByRole("button", { name: "Log in" }).click();
-    await expect(page).toHaveURL("/app?from=email");
+    await expect(page).toHaveURL("/interviews?from=email");
   });
 
   test("ignores off-site redirect targets", async ({ page }) => {
@@ -85,7 +87,7 @@ test.describe("login", () => {
     await page.getByLabel("Email").fill(testUser.email);
     await page.getByLabel("Password").fill(testUser.password);
     await page.getByRole("button", { name: "Log in" }).click();
-    await expect(page).toHaveURL("/app");
+    await expect(page).toHaveURL("/dashboard");
   });
 });
 
@@ -117,7 +119,7 @@ test.describe("signup", () => {
     await page.getByLabel(/^Password/).fill("practice-2026");
     await page.getByLabel("Confirm password").fill("practice-2026");
     await page.getByRole("button", { name: "Create account" }).click();
-    await expect(page).toHaveURL("/app");
+    await expect(page).toHaveURL("/dashboard");
     await expect(page.getByRole("heading", { level: 1, name: "Welcome, Test" })).toBeVisible();
     assertNoErrors();
   });
@@ -139,7 +141,7 @@ test.describe("signup", () => {
 
 test.describe("protected routes and sessions", () => {
   test("blocks unauthenticated visitors", async ({ page }) => {
-    const response = await page.goto("/app");
+    const response = await page.goto("/dashboard");
     await expect(page).toHaveURL("/login");
     expect(response?.status()).toBe(200);
     await expect(page.getByRole("heading", { name: /Welcome,/ })).toHaveCount(0);
@@ -148,34 +150,35 @@ test.describe("protected routes and sessions", () => {
   test("keeps signed-in users away from login and signup", async ({ page }) => {
     await createUser();
     await logIn(page);
-    await expect(page).toHaveURL("/app");
+    await expect(page).toHaveURL("/dashboard");
     await page.goto("/login");
-    await expect(page).toHaveURL("/app");
+    await expect(page).toHaveURL("/dashboard");
     await page.goto("/signup");
-    await expect(page).toHaveURL("/app");
+    await expect(page).toHaveURL("/dashboard");
   });
 
   test("logs out and protects the workspace again", async ({ page, context }) => {
     await createUser();
     await logIn(page);
-    await expect(page).toHaveURL("/app");
-    await page.getByRole("button", { name: "Log out" }).click();
+    await expect(page).toHaveURL("/dashboard");
+    await page.getByRole("button", { name: /Account menu for/ }).click();
+    await page.getByRole("menuitem", { name: "Log out" }).click();
     await expect(page).toHaveURL("/login?notice=signed_out");
     await expect(page.getByText("You have been logged out")).toBeVisible();
     const sessionCookies = (await context.cookies()).filter((cookie) =>
       /^sb-.+-auth-token/.test(cookie.name),
     );
     expect(sessionCookies).toEqual([]);
-    await page.goto("/app");
+    await page.goto("/dashboard");
     await expect(page).toHaveURL("/login");
   });
 
   test("handles an expired session", async ({ page }) => {
     await createUser();
     await logIn(page);
-    await expect(page).toHaveURL("/app");
+    await expect(page).toHaveURL("/dashboard");
     await expireSessions();
-    await page.goto("/app");
+    await page.goto("/dashboard");
     await expect(page).toHaveURL("/login?notice=session_expired");
     await expect(page.getByText("Your session has expired")).toBeVisible();
   });

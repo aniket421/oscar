@@ -51,7 +51,7 @@ describe("LoginForm", () => {
   it("submits valid input to the server action and shows its error", async () => {
     const user = userEvent.setup();
     login.mockResolvedValue({ status: "error", message: "The email or password is incorrect." });
-    render(<LoginForm next="/app?x=1" />);
+    render(<LoginForm next="/resume?x=1" />);
     await user.type(screen.getByRole("textbox", { name: "Email" }), "ada@example.com");
     await user.type(screen.getByLabelText(/^Password/), "secret-1");
     await user.click(screen.getByRole("button", { name: "Log in" }));
@@ -61,7 +61,7 @@ describe("LoginForm", () => {
     );
     const [, formData] = login.mock.calls[0] as [unknown, FormData];
     expect(formData.get("email")).toBe("ada@example.com");
-    expect(formData.get("next")).toBe("/app?x=1");
+    expect(formData.get("next")).toBe("/resume?x=1");
     expect(screen.getByRole("textbox", { name: "Email" })).toHaveValue("ada@example.com");
   });
 
