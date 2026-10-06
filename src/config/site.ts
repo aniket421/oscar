@@ -1,8 +1,9 @@
 /**
  * Static, non-secret application metadata.
- * Product copy and positioning are intentionally not defined in Phase 0.
  */
 export const siteConfig = {
-  name: "Oscar 2.0",
-  description: "Oscar 2.0 is under active development.",
+  name: "Oscar",
+  title: "Oscar | AI interview coach",
+  description:
+    "Oscar is an AI interview coach in development: realistic mock interviews, clear evaluation of your answers, and a personalized plan to improve.",
 } as const;

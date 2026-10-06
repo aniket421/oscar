@@ -1,5 +1,6 @@
 # server
 
-Server-only code: integrations with external services (database, AI provider, realtime, auth
-provider) behind narrow interfaces. Files here must never be imported by client components.
-Empty in Phase 0.
+Server-only adapters to external systems, behind narrow interfaces. Every module here imports
+`server-only`, so it can never end up in a client bundle. Code here never imports from `features/`.
+
+- `supabase/`: configuration, cookie policy, the request-scoped client, and proxy session refresh.

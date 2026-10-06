@@ -15,6 +15,8 @@ export interface SectionHeadingProps {
   as?: "h1" | "h2" | "h3";
   size?: HeadingSize;
   align?: "start" | "center";
+  /** Id for the heading, so a parent `<section>` can reference it with `aria-labelledby`. */
+  titleId?: string;
   className?: string;
 }
 
@@ -26,13 +28,14 @@ export function SectionHeading({
   as = "h2",
   size,
   align = "start",
+  titleId,
   className,
 }: SectionHeadingProps) {
   return (
     <div className={cn(styles.sectionHeading, styles[align], className)}>
       <div className={styles.text}>
         {eyebrow ? <p className={cn("text-overline", styles.eyebrow)}>{eyebrow}</p> : null}
-        <Heading as={as} size={size}>
+        <Heading as={as} size={size} id={titleId}>
           {title}
         </Heading>
         {description ? <p className={styles.description}>{description}</p> : null}

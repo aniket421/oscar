@@ -1,0 +1,107 @@
+.page {
+  padding-block: var(--space-16) var(--space-section);
+}
+
+.article {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.updated {
+  font-size: var(--text-small-size);
+  color: var(--color-foreground-muted);
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  font-size: var(--text-lead-size);
+  line-height: var(--text-lead-line);
+  color: var(--color-foreground-muted);
+}
+
+.toc {
+  padding: var(--space-6);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-background-subtle);
+}
+
+.tocTitle {
+  margin-bottom: var(--space-3);
+  font-size: var(--text-label-size);
+  font-weight: var(--font-weight-semibold);
+}
+
+.tocList {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-2) var(--space-6);
+  margin: 0;
+  padding-left: var(--space-5);
+  font-size: var(--text-small-size);
+}
+
+@media (min-width: 640px) {
+  .tocList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.tocList a {
+  color: var(--color-foreground);
+  text-underline-offset: 0.2em;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  scroll-margin-top: var(--space-20);
+}
+
+.sectionTitle {
+  font-size: var(--text-h3-size);
+  line-height: var(--text-h3-line);
+  letter-spacing: var(--text-h3-tracking);
+  font-weight: var(--font-weight-semibold);
+}
+
+.sectionNumber {
+  color: var(--color-accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.prose {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  font-size: var(--text-body-size);
+  line-height: var(--text-body-line);
+}
+
+.prose ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding-left: var(--space-5);
+}
+
+.prose a {
+  color: var(--color-foreground);
+  font-weight: var(--font-weight-medium);
+  text-underline-offset: 0.2em;
+}
+
+.prose strong {
+  font-weight: var(--font-weight-semibold);
+}

@@ -6,9 +6,19 @@ import { siteConfig } from "@/config/site";
 
 import "./globals.css";
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+
 export const metadata: Metadata = {
-  title: siteConfig.name,
+  ...(appUrl ? { metadataBase: new URL(appUrl) } : {}),
+  title: { default: siteConfig.title, template: `%s | ${siteConfig.name}` },
   description: siteConfig.description,
+  applicationName: siteConfig.name,
+  openGraph: {
+    type: "website",
+    siteName: siteConfig.name,
+    title: siteConfig.title,
+    description: siteConfig.description,
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

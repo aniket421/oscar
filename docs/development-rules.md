@@ -45,31 +45,49 @@ These rules apply to every change in Oscar 2.0, by humans and AI agents alike.
 17. Follow the forbidden-pattern list in the design system: no fake data, no decorative gradients,
     no pill buttons, no emoji icons, no AI-provider branding, no em dashes in product copy.
 18. Every new interactive component ships with keyboard and accessibility tests.
+19. Product copy describes only what exists. Anything not yet available is labelled as in
+    development. Marketing copy lives in `src/features/marketing/content.ts`.
+20. The Privacy Policy and Terms describe the product as it is. Update them, and their date,
+    before shipping any feature that collects new kinds of information (resumes, recordings,
+    answers, analytics).
+
+## Authentication and data access
+
+21. Every protected page, Server Action, and Route Handler verifies the user itself through
+    `@/features/auth/server` (`requireUser`/`getCurrentUser`). The proxy is a first line of
+    defense, not the authorization check.
+22. Never create a Supabase client in the browser, never expose Supabase keys through
+    `NEXT_PUBLIC_*`, and never use the service-role key in this app without an explicit design
+    review.
+23. Show users the messages from `describeAuthError()`, never raw provider errors. Log only error
+    name, status, and code.
+24. Accept redirect targets only through `safeRedirectPath()`.
 
 ## TypeScript
 
-19. Strict mode stays on. Do not weaken `tsconfig.json` flags to make code compile.
-20. No `any`. Use `unknown` and narrow. No `@ts-ignore`; `@ts-expect-error` only with a comment
+25. Strict mode stays on. Do not weaken `tsconfig.json` flags to make code compile.
+26. No `any`. Use `unknown` and narrow. No `@ts-ignore`; `@ts-expect-error` only with a comment
     explaining why.
-21. Use `import type` for type-only imports.
+27. Use `import type` for type-only imports.
 
 ## Quality gates
 
-22. Before every commit/PR, `npm run check` must pass (typecheck, lint with zero warnings,
-    format check, tests, production build).
-23. New logic ships with unit tests. Bug fixes ship with a test that would have caught the bug.
-24. Never skip, disable, or delete a failing test to get green — fix the cause.
-25. Do not disable lint rules inline without a comment explaining why.
+28. Before every commit/PR, `npm run check` must pass (typecheck, lint with zero warnings,
+    format check, tests, production build). Changes to routes, authentication, or page behavior
+    must also pass `npm run test:e2e`.
+29. New logic ships with unit tests. Bug fixes ship with a test that would have caught the bug.
+30. Never skip, disable, or delete a failing test to get green — fix the cause.
+31. Do not disable lint rules inline without a comment explaining why.
 
 ## Git
 
-26. Small, focused commits with descriptive messages in the imperative mood.
-27. Never commit generated output (`.next/`, `coverage/`, `node_modules/`, `*.tsbuildinfo`).
-28. Lockfile changes are committed together with the `package.json` change that caused them.
+32. Small, focused commits with descriptive messages in the imperative mood.
+33. Never commit generated output (`.next/`, `coverage/`, `node_modules/`, `*.tsbuildinfo`).
+34. Lockfile changes are committed together with the `package.json` change that caused them.
 
 ## Documentation
 
-29. Each phase has a QA checklist in `docs/qa/phase-N.md` that must be completed before the phase
+35. Each phase has a QA checklist in `docs/qa/phase-N.md` that must be completed before the phase
     is declared done.
-30. Update `README.md` and `docs/architecture.md` in the same change that alters setup, scripts,
+36. Update `README.md` and `docs/architecture.md` in the same change that alters setup, scripts,
     structure, or architecture.

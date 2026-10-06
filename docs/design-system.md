@@ -1,6 +1,6 @@
 # Oscar Design System
 
-**Status:** Phase 1. This document is the source of truth for every Oscar interface. If code and
+**Status:** Phase 1, extended in Phase 2 with page patterns (section 14). This document is the source of truth for every Oscar interface. If code and
 this document disagree, fix one of them in the same change.
 
 - Tokens: `src/styles/tokens.css`
@@ -89,7 +89,7 @@ Display through H3 are fluid (`clamp()`), scaling between ~360px and ~1440px vie
 
 | Role     | Class            | Size              | Line height | Tracking          | Weight     |
 | -------- | ---------------- | ----------------- | ----------- | ----------------- | ---------- |
-| Display  | `.text-display`  | 44 → 76px         | 1.02        | -0.04em           | 600        |
+| Display  | `.text-display`  | 44 → 68px         | 1.02        | -0.04em           | 600        |
 | H1       | `.text-h1`       | 36 → 56px         | 1.06        | -0.035em          | 600        |
 | H2       | `.text-h2`       | 28 → 40px         | 1.12        | -0.028em          | 600        |
 | H3       | `.text-h3`       | 22 → 26px         | 1.25        | -0.02em           | 600        |
@@ -290,7 +290,55 @@ setting `data-theme="dark"` on a container. The attribute re-maps semantic token
 - Emoji used as icons. Generic AI-provider logos, names, or styling.
 - Fake testimonials, user counts, company logos, statistics, reviews, interview results, or activity.
 - Marketing clichés (for example "Revolutionize your career with AI").
-- Em dashes in product copy (a test scans `.tsx` files).
+- Em dashes in product copy (a test scans `.tsx` files and the landing page copy).
 - Cursor-following effects, excessive parallax, excessive scroll animation, floating objects,
   unnecessary 3D.
 - Raw color values or arbitrary spacing outside the token files.
+
+## 14. Page patterns (Phase 2)
+
+Patterns established by the landing page and auth pages. Reuse them before inventing new ones.
+
+**Marketing sections** (`features/marketing/components/section.tsx`): every section is a
+`<section>` labelled by its heading, with an eyebrow, an H2 via `SectionHeading` (`titleId`), and
+`--space-section` vertical rhythm. Alternate `tone="subtle"` bands sparingly for rhythm. Copy lives
+in `features/marketing/content.ts`.
+
+**Honest status.** Anything not yet available is labelled. Use a warning `Badge` ("In development")
+with a one-line note, or the hero status line (amber dot + sentence + link). Never imply a feature
+works before it does.
+
+**Product previews.** A preview of unbuilt UI is a `<figure>` whose mock UI is `inert` (cannot be
+focused or operated, hidden from assistive technology), followed by a visible `figcaption` that says
+it is illustrative, plus a visually hidden text summary. Mock controls are styled spans, never real
+buttons. Example content is labelled "Example". No scores or results.
+
+**Dark feature panels.** The hero stage, interview preview, and final call to action use
+`data-theme="dark"`, `--radius-xl`, a border, and `--shadow-md` (not `--shadow-lg`; large panels
+with a large shadow read as glow).
+
+**Headers.** Sticky, solid background with a bottom border (no blur). A "Skip to content" link is
+the first focusable element. Below 1024px, section links move into a disclosure menu (`MobileNav`):
+a labelled toggle with `aria-expanded`/`aria-controls`, closed by Escape (focus returns to the
+toggle) or by choosing a link.
+
+**Auth pages.** Split layout from 1024px: a dark brand panel (presence mark, one line, footnote) and
+the form column; below 1024px, only the form column with the wordmark on top. Panels are at most
+26rem wide.
+
+**Forms with Server Actions.**
+
+1. `noValidate` on the form; validate in the browser with the same function the action uses.
+2. On invalid input: prevent submission, show field errors, focus the first invalid field.
+3. Editing a field clears its error.
+4. While pending, the submit button shows `loading` and a present-participle label ("Logging in").
+5. Server errors that are not about one field appear in an `Alert` with `role="alert"` above the
+   fields. Provider messages are never shown verbatim.
+6. Keep typed values (except passwords) after a failed submission.
+7. When a form is replaced by a result (for example "Check your email"), move focus to the result.
+
+**Status and empty states.** Use `OscarStatus` (for example the `/app` placeholder and the signup
+confirmation) so every such state looks and reads the same.
+
+**Icons added in Phase 2:** `MenuIcon`, `DocumentIcon`, `CodeIcon`, `ConversationIcon`,
+`FeedbackIcon`, `RouteIcon`. Same 24px grid and 1.75 stroke as the rest of the set.

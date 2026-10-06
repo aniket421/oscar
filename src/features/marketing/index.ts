@@ -1,0 +1,9 @@
+export { Capabilities } from "./components/capabilities";
+export { FeatureGrid } from "./components/feature-grid";
+export { FinalCta } from "./components/final-cta";
+export { Hero } from "./components/hero";
+export { HowItWorks } from "./components/how-it-works";
+export { InterviewPreview } from "./components/interview-preview";
+export { Principles } from "./components/principles";
+export { SiteFooter } from "./components/site-footer";
+export { SiteHeader } from "./components/site-header";

@@ -1,0 +1,21 @@
+.page {
+  padding-block: var(--space-16) var(--space-section);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.email {
+  font-size: var(--text-h3-size);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-foreground);
+  text-underline-offset: 0.2em;
+}
+
+.content a:not(.email) {
+  color: var(--color-foreground);
+  text-underline-offset: 0.2em;
+}

@@ -112,3 +112,55 @@ export function MicrophoneIcon(props: IconProps) {
     </Icon>
   );
 }
+
+export function MenuIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M4 7h16M4 12h16M4 17h16" />
+    </Icon>
+  );
+}
+
+export function DocumentIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8l-5-5z" />
+      <path d="M14 3v5h5M9 13h6M9 17h4" />
+    </Icon>
+  );
+}
+
+export function CodeIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M8.5 8L4.5 12l4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13" />
+    </Icon>
+  );
+}
+
+export function ConversationIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M20 12.5a7.5 7.5 0 01-11 6.6L4 20.5l1.4-4.6A7.5 7.5 0 1120 12.5z" />
+      <path d="M9 11h6M9 14.5h4" />
+    </Icon>
+  );
+}
+
+export function FeedbackIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
+    </Icon>
+  );
+}
+
+export function RouteIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <circle cx="6" cy="18" r="2" />
+      <circle cx="18" cy="6" r="2" />
+      <path d="M8 18h7.5a3.5 3.5 0 000-7h-7a3.5 3.5 0 010-7H16" />
+    </Icon>
+  );
+}

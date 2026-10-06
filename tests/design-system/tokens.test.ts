@@ -176,7 +176,7 @@ describe("design system rules", () => {
 
   it("use no em dashes in product copy", () => {
     const offenders = sourceFiles
-      .filter((file) => file.endsWith(".tsx"))
+      .filter((file) => file.endsWith(".tsx") || file.includes(`${join("features", "marketing")}`))
       .filter((file) => readFileSync(file, "utf8").includes("—"))
       .map((file) => relative(root, file));
     expect(offenders).toEqual([]);
