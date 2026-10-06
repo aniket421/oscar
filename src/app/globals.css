@@ -1,0 +1,16 @@
+/* Phase 0: minimal global reset only. Design tokens arrive with the UI phase. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+}
