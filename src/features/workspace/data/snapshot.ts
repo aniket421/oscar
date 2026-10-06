@@ -10,7 +10,7 @@ import type {
   UserProfile,
 } from "@/types/domain";
 
-import { unconnectedDataSource, type WorkspaceDataSource } from "./source";
+import { unconnectedDataSource, type ProfileSummary, type WorkspaceDataSource } from "./source";
 
 /** Everything the dashboard needs, loaded for one verified user. */
 export interface WorkspaceSnapshot {
@@ -23,14 +23,15 @@ export interface WorkspaceSnapshot {
 
 export const RECENT_INTERVIEW_LIMIT = 5;
 
-export function toUserProfile(user: AuthUser): UserProfile {
+/** The signed-in person: the profile's name when set, otherwise the account's. */
+export function toUserProfile(user: AuthUser, summary: ProfileSummary | null = null): UserProfile {
   return {
     id: user.id,
     email: user.email,
-    name: user.name,
+    name: summary?.fullName ?? user.name,
     createdAt: user.createdAt,
-    targetRole: null,
-    experienceLevel: null,
+    targetRole: summary?.targetRole ?? null,
+    experienceLevel: summary?.experienceLevel ?? null,
   };
 }
 
@@ -42,17 +43,19 @@ export async function loadWorkspaceSnapshot(
   user: AuthUser,
   source: WorkspaceDataSource = unconnectedDataSource,
 ): Promise<WorkspaceSnapshot> {
-  const [recentInterviews, resume, roadmap, technical, behavioral, coding] = await Promise.all([
-    source.listRecentInterviews(user.id, RECENT_INTERVIEW_LIMIT),
-    source.getResume(user.id),
-    source.getRoadmap(user.id),
-    source.listPracticeSessions(user.id, "technical"),
-    source.listPracticeSessions(user.id, "behavioral"),
-    source.listPracticeSessions(user.id, "coding"),
-  ]);
+  const [summary, recentInterviews, resume, roadmap, technical, behavioral, coding] =
+    await Promise.all([
+      source.getProfileSummary(user.id),
+      source.listRecentInterviews(user.id, RECENT_INTERVIEW_LIMIT),
+      source.getResume(user.id),
+      source.getRoadmap(user.id),
+      source.listPracticeSessions(user.id, "technical"),
+      source.listPracticeSessions(user.id, "behavioral"),
+      source.listPracticeSessions(user.id, "coding"),
+    ]);
 
   return {
-    profile: toUserProfile(user),
+    profile: toUserProfile(user, summary),
     recentInterviews,
     resume,
     roadmap,

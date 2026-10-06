@@ -35,9 +35,23 @@ describe("Privacy Policy content", () => {
   it("states only what the product collects today", () => {
     render(<PrivacyPolicy />);
     expect(
-      screen.getByText(/does not yet collect resumes, interview recordings, or interview answers/),
+      screen.getByText(/does not yet collect interview recordings or interview answers/),
     ).toBeInTheDocument();
     expect(screen.getByText(/only cookies that are strictly necessary/)).toBeInTheDocument();
+  });
+
+  it("describes resume and profile collection, processing, and deletion", () => {
+    render(<PrivacyPolicy />);
+    expect(
+      screen.getByRole("heading", { name: /\d+\. Resumes and profile information/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/full text of your resume is read only while it is processed/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/not sent to any third-party service for analysis/),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Deleting a resume removes the file/)).toBeInTheDocument();
   });
 });
 

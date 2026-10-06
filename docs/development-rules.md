@@ -105,3 +105,31 @@ These rules apply to every change in Oscar 2.0, by humans and AI agents alike.
     is declared done.
 41. Update `README.md` and `docs/architecture.md` in the same change that alters setup, scripts,
     structure, or architecture.
+
+## Candidate data, database, and files (Phase 4)
+
+42. `supabase/migrations/` is the source of truth for the schema. Every change is a new migration;
+    `src/server/supabase/database.ts` and the validators change in the same commit.
+43. Every user-owned table has RLS enabled, per-command policies for `authenticated` that compare
+    `user_id` with `(select auth.uid())`, and no privileges for `anon`. Every new table gets cases
+    in `tests/db/rls.test.ts` (owner can, other user cannot, anonymous cannot).
+44. Data is read and written only through `src/server/candidate` with the user's own session. The
+    service-role key is not used by the application; introducing it needs a design review.
+45. Storage buckets are private. Objects live under `user/<user id>/...` and reach the browser
+    only through authenticated Route Handlers with `Cache-Control: private`. Never send a public
+    or signed storage URL to the client.
+46. Files are validated on the server by content (signature), not by name or declared type.
+    Route Handlers that accept files check the request origin (`isSameOriginRequest`).
+47. Never log resume contents, extracted values, file names, or profile field values. Log the
+    operation, an id, and an error kind or code (`logDataError`).
+48. Resume parsing runs on the server only, with code that runs inside Oscar. Sending resume or
+    profile data to a third party (including AI providers) needs a documented design and a
+    Privacy Policy update first.
+49. Resume-derived data is labelled as such and reaches the profile only when the candidate
+    chooses; it never overwrites something they entered. Never invent findings, analyses, or
+    scores.
+50. Deleting or replacing a file removes the object and its metadata, in an order that cannot
+    leave an orphaned file or a row without a file. Test it.
+51. Controls that only work with JavaScript (file pickers, edit toggles) stay disabled until the
+    page is hydrated (`useHydrated`), and forms that must keep typed values after a server error
+    dispatch their action from `onSubmit` instead of `<form action>` (which resets the fields).

@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import type { ButtonHTMLAttributes, ReactNode, Ref } from "react";
 
 import { cn } from "@/lib/cn";
 
@@ -32,6 +32,7 @@ export interface ButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement>, Omit<ButtonStyleOptions, "className"> {
   /** Shows a spinner, blocks interaction, and marks the button busy. */
   loading?: boolean;
+  ref?: Ref<HTMLButtonElement>;
   leadingIcon?: ReactNode;
   trailingIcon?: ReactNode;
 }

@@ -21,9 +21,9 @@ export const emptyStates = {
   resume: {
     title: "No resume added",
     description:
-      "Oscar will use your resume to tailor interview questions to your real experience.",
+      "Upload your resume and Oscar will read it to find your contact details and skills.",
     reason: "Interviewers ask about what is on your resume, so your practice should too.",
-    next: "Resume upload arrives in a later update. Nothing is needed from you yet.",
+    next: "Upload a PDF or Word file. You can replace or delete it at any time.",
   },
   roadmap: {
     title: "No roadmap yet",

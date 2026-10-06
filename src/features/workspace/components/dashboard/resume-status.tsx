@@ -2,21 +2,13 @@ import Link from "next/link";
 
 import { DocumentIcon } from "@/components/icons";
 import { Badge } from "@/components/ui";
+import { resumeStatusLabels as statusLabels } from "@/features/candidate";
 import type { Resume } from "@/types/domain";
 
 import { emptyStates } from "../../content";
 import { AreaEmptyState } from "../area-empty-state";
 import { DashboardSection } from "./dashboard-section";
 import styles from "./side-panels.module.css";
-
-const statusLabels: Record<
-  Resume["status"],
-  { label: string; tone: "neutral" | "success" | "error" }
-> = {
-  processing: { label: "Processing", tone: "neutral" },
-  ready: { label: "Ready", tone: "success" },
-  failed: { label: "Could not be read", tone: "error" },
-};
 
 export function ResumeStatus({ resume }: { resume: Resume | null }) {
   return (
@@ -36,7 +28,7 @@ export function ResumeStatus({ resume }: { resume: Resume | null }) {
           visual={<DocumentIcon size={20} />}
           action={
             <Link href="/resume" className={styles.textLink}>
-              About resume analysis
+              Upload your resume
             </Link>
           }
         />

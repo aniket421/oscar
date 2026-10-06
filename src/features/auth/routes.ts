@@ -80,6 +80,8 @@ export type RouteDecision = { type: "allow" } | { type: "redirect"; location: st
 interface RouteContext {
   pathname: string;
   search: string;
+  /** HTTP method. Only page loads (GET, HEAD) are redirected; see `decideRouteAccess`. */
+  method?: string;
   isAuthenticated: boolean;
   /** True when the request carried a session that the provider rejected (expired or revoked). */
   sessionRejected: boolean;
@@ -87,10 +89,21 @@ interface RouteContext {
   next?: string | null;
 }
 
+/** Methods that load a page. Everything else (Server Actions, uploads) is a mutation. */
+function isPageLoad(method: string | undefined): boolean {
+  return method === undefined || method === "GET" || method === "HEAD";
+}
+
+/**
+ * The proxy's optimistic decision. Signed-out page loads in protected areas go to the login
+ * page. Signed-out mutations (Server Action and upload POSTs) are passed through instead: a
+ * redirect would be replayed as a POST to /login, and every action and handler verifies the
+ * session itself and answers in a form its caller understands (an action redirect, or a 401).
+ */
 export function decideRouteAccess(context: RouteContext): RouteDecision {
   const { pathname, search, isAuthenticated, sessionRejected } = context;
 
-  if (isProtectedPath(pathname) && !isAuthenticated) {
+  if (isProtectedPath(pathname) && !isAuthenticated && isPageLoad(context.method)) {
     return {
       type: "redirect",
       location: loginUrl({

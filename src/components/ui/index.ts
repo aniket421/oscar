@@ -18,6 +18,7 @@ export {
   type CardProps,
 } from "./card";
 export { Checkbox, type CheckboxProps } from "./checkbox";
+export { CheckboxGroup, type CheckboxGroupProps, type CheckboxOption } from "./checkbox-group";
 export { Dialog, type DialogProps } from "./dialog";
 export { Divider, type DividerProps } from "./divider";
 export { Drawer, type DrawerProps } from "./drawer";

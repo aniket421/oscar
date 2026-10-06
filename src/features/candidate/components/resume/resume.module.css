@@ -1,0 +1,341 @@
+/* Resume page: hairline sections in a 3:2 layout, matching the dashboard. No cards. */
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-12);
+}
+
+@media (min-width: 1024px) {
+  .layout {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    gap: var(--space-16);
+    align-items: start;
+  }
+}
+
+.main,
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+.block,
+.sideBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding-top: var(--space-6);
+  border-top: var(--border-width) solid var(--color-border);
+}
+
+.block > *,
+.sideBlock > * {
+  max-width: 100%;
+}
+
+.blockHeading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.blockTitle,
+.sideTitle {
+  font-size: var(--text-h4-size);
+  line-height: var(--text-h4-line);
+  letter-spacing: var(--text-h4-tracking);
+  font-weight: var(--font-weight-semibold);
+}
+
+.blockText {
+  font-size: var(--text-small-size);
+  line-height: var(--text-small-line);
+  color: var(--color-foreground-muted);
+}
+
+.placeholder {
+  font-size: var(--text-small-size);
+  line-height: var(--text-small-line);
+  color: var(--color-foreground-muted);
+}
+
+.footnote {
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  color: var(--color-foreground-muted);
+}
+
+.link {
+  color: var(--color-foreground);
+  font-weight: var(--font-weight-medium);
+  text-underline-offset: 0.2em;
+  overflow-wrap: anywhere;
+}
+
+/* Current resume */
+
+.file {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  width: 100%;
+}
+
+.fileIcon {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-background-subtle);
+  color: var(--color-foreground-muted);
+}
+
+.fileText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5);
+  min-width: 0;
+}
+
+.fileName {
+  font-weight: var(--font-weight-medium);
+  overflow-wrap: anywhere;
+}
+
+.fileMeta {
+  font-size: var(--text-small-size);
+  color: var(--color-foreground-muted);
+}
+
+.statusLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+.statusText {
+  font-size: var(--text-small-size);
+  color: var(--color-foreground-muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Uploader */
+
+.uploader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 36rem;
+}
+
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-6) var(--space-4);
+  border: var(--border-width) dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-background-subtle);
+  text-align: center;
+  transition:
+    border-color var(--duration-fast) var(--ease-standard),
+    background-color var(--duration-fast) var(--ease-standard);
+}
+
+.dragging {
+  border-color: var(--color-primary);
+  background: var(--color-primary-subtle);
+}
+
+.dropIcon {
+  color: var(--color-foreground-muted);
+}
+
+.dropTitle {
+  font-weight: var(--font-weight-medium);
+}
+
+.dropHint {
+  font-size: var(--text-small-size);
+  line-height: var(--text-small-line);
+  color: var(--color-foreground-muted);
+}
+
+.dropActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.uploadProgress {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.uploadProgress > :first-child {
+  width: 100%;
+}
+
+/* Findings */
+
+.facts {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0;
+}
+
+.facts > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-1);
+  padding-block: var(--space-3);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+@media (min-width: 640px) {
+  .facts > div {
+    grid-template-columns: 8rem minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+}
+
+.facts > div:last-child {
+  border-bottom: 0;
+}
+
+.facts dt {
+  font-size: var(--text-small-size);
+  color: var(--color-foreground-muted);
+}
+
+.facts dd {
+  margin: 0;
+  font-size: var(--text-small-size);
+  overflow-wrap: anywhere;
+}
+
+.notFound {
+  color: var(--color-foreground-subtle);
+}
+
+.plainList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.subsection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.subTitle {
+  font-size: var(--text-overline-size);
+  letter-spacing: var(--text-overline-tracking);
+  text-transform: uppercase;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-foreground-subtle);
+}
+
+.quote {
+  margin: 0;
+  padding-left: var(--space-4);
+  border-left: 2px solid var(--color-border-strong);
+  font-size: var(--text-small-size);
+  line-height: var(--text-small-line);
+  overflow-wrap: anywhere;
+}
+
+.skills {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.skills form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.skillFieldset {
+  align-self: stretch;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.skillLegend {
+  margin-bottom: var(--space-2);
+  padding: 0;
+  font-size: var(--text-small-size);
+  font-weight: var(--font-weight-medium);
+}
+
+.skillChoices {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: var(--space-2) var(--space-4);
+}
+
+.mutedList {
+  font-size: var(--text-small-size);
+  color: var(--color-foreground-muted);
+  overflow-wrap: anywhere;
+}
+
+.formStatus {
+  font-size: var(--text-small-size);
+  color: var(--color-success);
+  font-weight: var(--font-weight-medium);
+}
+
+.formStatus:empty {
+  display: none;
+}
+
+/* Analysis */
+
+.analysisPending {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.bulletList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1-5);
+  margin: 0;
+  padding-left: var(--space-5);
+  font-size: var(--text-small-size);
+  line-height: var(--text-small-line);
+}

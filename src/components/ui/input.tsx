@@ -1,4 +1,4 @@
-import type { InputHTMLAttributes } from "react";
+import type { InputHTMLAttributes, Ref } from "react";
 
 import { cn } from "@/lib/cn";
 
@@ -8,6 +8,7 @@ import styles from "./field.module.css";
 export interface InputProps
   extends FieldProps, Omit<InputHTMLAttributes<HTMLInputElement>, keyof FieldProps> {
   inputClassName?: string;
+  ref?: Ref<HTMLInputElement>;
 }
 
 export function Input({

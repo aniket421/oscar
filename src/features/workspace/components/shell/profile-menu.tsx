@@ -12,10 +12,12 @@ export interface ProfileMenuProps {
   /** Display name: the user's name, or their email when no name is set. */
   displayName: string;
   email: string;
+  /** Profile photo URL, when the user has one. */
+  avatarSrc?: string;
 }
 
 /** Account menu: who is signed in, links to Profile and Settings, and Log out. */
-export function ProfileMenu({ displayName, email }: ProfileMenuProps) {
+export function ProfileMenu({ displayName, email, avatarSrc }: ProfileMenuProps) {
   const logoutForm = useRef<HTMLFormElement>(null);
 
   return (
@@ -37,7 +39,7 @@ export function ProfileMenu({ displayName, email }: ProfileMenuProps) {
         trigger={(triggerProps) => (
           <button type="button" className={styles.trigger} {...triggerProps}>
             <span aria-hidden="true">
-              <Avatar name={displayName} size="sm" />
+              <Avatar name={displayName} size="sm" src={avatarSrc} />
             </span>
             <span className={styles.name}>
               <span className="visually-hidden">Account menu for</span> {displayName}

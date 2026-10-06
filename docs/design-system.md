@@ -387,3 +387,53 @@ shown.
 **Preserved pages.** Next.js keeps visited pages mounted but hidden. Forms that hold sensitive or
 one-time input (login, signup) are wrapped in `ResetOnHide`. Each shell's `<main>` has its own id
 (`content`, `workspace-main`) so skip links never target a hidden page.
+
+## 16. Profile and resume patterns (Phase 4)
+
+**Editable sections.** The profile is a stack of sections in the account layout (label column,
+content column, hairline between sections). Each shows a read view with an outline "Edit" button
+(`Edit` plus a visually hidden section name). Editing replaces the read view with that section's
+form only: never one giant form. Opening moves focus to the first field; Save or Cancel returns
+focus to the Edit button, and a saved message appears in the section's status line
+(`role="status"`, success color).
+
+**Missing values.** Read views list every field. Empty ones say "Not added" in the subtle
+foreground color, so a candidate sees what is missing without placeholders that look like data.
+
+**Entry lists.** Education, experience, projects, and certifications are rows divided by
+hairlines: title (body, semibold), subtitle, a muted meta line (dates as "Mar 2021 to present"),
+then text. Ghost "Edit" and "Remove" buttons sit at the row's end from 640px. "Add …" is an
+outline button with a plus icon under the list. Removing asks first in a small `Dialog`
+(`ConfirmActionDialog`): Cancel (ghost) and a destructive confirm with a pending label.
+
+**Skills.** Grouped by category under overline labels. Each skill is a rectangular tag
+(`--radius-sm`, hairline border): the name is a button that opens an inline editor, an icon
+button removes it, and skills taken from a resume carry a small "From resume" marker on the
+primary-subtle surface. Never pills.
+
+**Completeness.** `CompletenessSummary`: an H4-size heading, a small determinate `Progress`
+labelled "N of M complete", one sentence saying it is not a rating, and up to four next steps as
+links. It reports stored data only.
+
+**Resume page.** Hairline sections in the dashboard's 3:2 layout. The current resume is a file
+row (icon tile, name, "PDF · 312 KB · Uploaded …"), a status line in a live region (status
+`Badge` plus a sentence), and actions: Download (a real link), Replace (reveals the uploader),
+Delete (confirmation dialog). Processing shows an indeterminate `Progress` and refreshes itself.
+Failures use an error `Alert` with plain-language guidance and "Try again" only when a retry can
+help.
+
+**Uploader.** A dashed, rounded-md drop area on the subtle background (emerald border and
+primary-subtle fill while dragging), with an icon, a one-line title, the accepted types and size,
+and a "Choose file" button (the file input itself is hidden and not focusable). Upload shows a
+determinate `Progress` with the percentage and a "Cancel upload" button; errors use an `Alert`
+with `role="alert"`.
+
+**Findings and analysis.** What the parser found is a definition list headed by a sentence that
+says it was read automatically and changes nothing on its own. Values not found say "Not found".
+Skills found offer checkboxes and one "Add N skills to profile" button. The analysis section
+states its real status ("Analysis will appear after processing", "in development") and never
+shows placeholder scores or sample insights.
+
+**New in the library:** `CheckboxGroup` (fieldset, legend, native checkboxes, horizontal or
+vertical), `ref` on `Button` and `Input`, and `PlusIcon`, `PencilIcon`, `TrashIcon`, `UploadIcon`,
+`DownloadIcon`.

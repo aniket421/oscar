@@ -3,9 +3,9 @@ import { Suspense } from "react";
 
 import { OscarWordmark } from "@/components/oscar";
 import { buttonStyles, Skeleton } from "@/components/ui";
-import { getCurrentUser } from "@/features/auth/server";
 
 import styles from "./app-header.module.css";
+import { getAccountSummary } from "../../server";
 import { CurrentSection } from "./current-section";
 import { MobileNavigation } from "./mobile-navigation";
 import { ProfileMenu } from "./profile-menu";
@@ -37,7 +37,13 @@ export function AppHeader() {
 }
 
 async function AccountMenu() {
-  const user = await getCurrentUser();
-  if (!user) return null;
-  return <ProfileMenu displayName={user.name ?? user.email} email={user.email} />;
+  const account = await getAccountSummary();
+  if (!account) return null;
+  return (
+    <ProfileMenu
+      displayName={account.displayName}
+      email={account.email}
+      avatarSrc={account.avatarSrc ?? undefined}
+    />
+  );
 }

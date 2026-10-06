@@ -8,5 +8,9 @@ a public API through its `index.ts`. Features must not import each other's inter
 - `workspace/`: the signed-in application shell (sidebar, header, mobile drawer, profile menu),
   the dashboard and area pages, navigation, availability flags, and data loading (server-only
   entry point: `@/features/workspace/server`).
+- `candidate/`: the candidate profile and resume intelligence: validation, completeness, the
+  skills catalog, file checks, the server-side processing pipeline (`processing/`), Server
+  Actions, file Route Handler logic, and the profile and resume pages' components (server-only
+  entry point: `@/features/candidate/server`). See `docs/candidate-intelligence.md`.
 - `marketing/`: landing page sections, site header and footer, and their copy (`content.ts`).
 - `legal/`: Privacy Policy, Terms & Conditions, and contact configuration.

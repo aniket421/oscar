@@ -2,7 +2,8 @@ import { defineConfig, devices } from "@playwright/test";
 
 /**
  * End-to-end tests run the production build against a local mock of the
- * Supabase Auth API (tests/e2e/mock-auth). No real credentials are used: the
+ * Supabase project (tests/e2e/mock-supabase: Auth, plus the Data and Storage APIs over a real
+ * Postgres engine with Oscar's migrations). No real credentials are used: the
  * values below are test-only placeholders for a server on 127.0.0.1.
  */
 const APP_PORT = 3100;
@@ -44,9 +45,13 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: "node tests/e2e/mock-auth/server.mts",
+      command: "node tests/e2e/mock-supabase/server.mts",
       url: `${MOCK_AUTH_URL}/health`,
-      env: { MOCK_AUTH_PORT: String(MOCK_AUTH_PORT) },
+      env: {
+        MOCK_AUTH_PORT: String(MOCK_AUTH_PORT),
+        // Requests carrying only this key run as the anonymous role.
+        MOCK_SUPABASE_PUBLISHABLE_KEY: appEnv.SUPABASE_PUBLISHABLE_KEY,
+      },
       reuseExistingServer: false,
     },
     {

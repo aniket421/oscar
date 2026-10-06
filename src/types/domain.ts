@@ -1,6 +1,7 @@
 /**
- * Domain model for Oscar's workspace. These types describe data that later
- * phases will store and produce; Phase 3 only defines their shape.
+ * Domain model for Oscar's workspace. Interview, roadmap, and practice types
+ * describe data that later phases will store; the candidate profile and resume
+ * (Phase 4) live in `candidate.ts` and are re-exported here.
  *
  * Deliberately absent: numeric scores and ratings. The evaluation model is an
  * open decision (docs/architecture.md), so no score fields exist yet.
@@ -62,20 +63,14 @@ export interface InterviewSession {
   turns: readonly InterviewTurn[];
 }
 
-export type ResumeStatus = "processing" | "ready" | "failed";
-
-/** An uploaded resume. Parsed content and analysis are later-phase concerns. */
-export interface Resume {
-  id: string;
-  userId: string;
-  fileName: string;
-  uploadedAt: ISODateString;
-  status: ResumeStatus;
-}
+export type { Resume, ResumeStatus } from "./candidate";
 
 export type SkillCategory = "technical" | "behavioral" | "communication" | "coding";
 
-/** A skill Oscar can give feedback on. */
+/**
+ * A skill Oscar can give interview feedback on. Not the same as a candidate's
+ * own listed skills (`CandidateSkill` in candidate.ts).
+ */
 export interface Skill {
   id: string;
   name: string;

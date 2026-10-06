@@ -1,9 +1,10 @@
 import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 
-/** Test fixture helpers. They talk to the mock auth server, never to a real provider. */
+/** Test fixture helpers. They talk to the mock Supabase server, never to a real provider. */
 const MOCK_AUTH_URL = "http://127.0.0.1:54329";
 
+/** Clears every user, session, database row, and stored file in the mock. */
 export async function resetAuth() {
   await fetch(`${MOCK_AUTH_URL}/__test/reset`, { method: "POST" });
 }
@@ -12,10 +13,23 @@ export async function expireSessions() {
   await fetch(`${MOCK_AUTH_URL}/__test/expire-sessions`, { method: "POST" });
 }
 
-export const testUser = {
+export interface TestUser {
+  name: string;
+  email: string;
+  password: string;
+}
+
+export const testUser: TestUser = {
   name: "Test Candidate",
   email: "candidate@example.test",
   password: "practice-2026",
+};
+
+/** A second account, for ownership isolation tests. */
+export const otherUser: TestUser = {
+  name: "Other Candidate",
+  email: "other@example.test",
+  password: "practice-2027",
 };
 
 export async function createUser(user = testUser) {
@@ -34,8 +48,8 @@ export async function logIn(page: Page, email = testUser.email, password = testU
 }
 
 /** Logs in and waits until the workspace has loaded, so the session cookie is set. */
-export async function logInToWorkspace(page: Page) {
-  await logIn(page);
+export async function logInToWorkspace(page: Page, user: TestUser = testUser) {
+  await logIn(page, user.email, user.password);
   await expect(page).toHaveURL("/dashboard");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 }

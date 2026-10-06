@@ -14,6 +14,7 @@ export async function proxy(request: NextRequest) {
   const decision = decideRouteAccess({
     pathname: request.nextUrl.pathname,
     search: request.nextUrl.search,
+    method: request.method,
     isAuthenticated: session.isAuthenticated,
     sessionRejected: session.sessionRejected,
     next: request.nextUrl.searchParams.get("next"),

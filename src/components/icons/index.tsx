@@ -203,3 +203,47 @@ export function SlidersIcon(props: IconProps) {
     </Icon>
   );
 }
+
+export function PlusIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M12 5v14M5 12h14" />
+    </Icon>
+  );
+}
+
+export function PencilIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M4 20h4L19 9a2.83 2.83 0 00-4-4L4 16v4z" />
+      <path d="M13.5 6.5l4 4" />
+    </Icon>
+  );
+}
+
+export function TrashIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M4 7h16M10 11v6M14 11v6" />
+      <path d="M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V4h6v3" />
+    </Icon>
+  );
+}
+
+export function UploadIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M12 15V4M7.5 8.5L12 4l4.5 4.5" />
+      <path d="M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3" />
+    </Icon>
+  );
+}
+
+export function DownloadIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M12 4v11M7.5 10.5L12 15l4.5-4.5" />
+      <path d="M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3" />
+    </Icon>
+  );
+}

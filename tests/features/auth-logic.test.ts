@@ -203,6 +203,22 @@ describe("decideRouteAccess", () => {
     });
   });
 
+  it("redirects page loads but passes signed-out mutations to their handlers", () => {
+    expect(decideRouteAccess({ ...base, pathname: "/profile", method: "GET" }).type).toBe(
+      "redirect",
+    );
+    expect(decideRouteAccess({ ...base, pathname: "/profile", method: "HEAD" }).type).toBe(
+      "redirect",
+    );
+    // Server Actions and uploads verify the session themselves and answer in their own format.
+    expect(decideRouteAccess({ ...base, pathname: "/profile", method: "POST" })).toEqual({
+      type: "allow",
+    });
+    expect(decideRouteAccess({ ...base, pathname: "/resume/upload", method: "POST" })).toEqual({
+      type: "allow",
+    });
+  });
+
   it("explains expired sessions", () => {
     expect(decideRouteAccess({ ...base, pathname: "/dashboard", sessionRejected: true })).toEqual({
       type: "redirect",

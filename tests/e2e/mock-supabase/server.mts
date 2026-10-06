@@ -1,13 +1,18 @@
 /**
- * TEST FIXTURE: a minimal in-memory stand-in for the Supabase Auth (GoTrue)
- * HTTP API, used only by the Playwright end-to-end suite. It lets the real
- * app code (@supabase/ssr, server actions, proxy) run against predictable
- * responses without a hosted project or real credentials.
+ * TEST FIXTURE: a stand-in for a Supabase project, used only by the Playwright end-to-end
+ * suite. It serves:
+ *   - a minimal in-memory Auth (GoTrue) API;
+ *   - the Data API (PostgREST) and Storage API subset Oscar uses, through the emulator in
+ *     tests/support/supabase, backed by a real Postgres engine (PGlite) with Oscar's actual
+ *     migrations applied. Requests run as the signed-in user, so the real RLS policies apply.
  *
- * Never imported by application code. Run with: node tests/e2e/mock-auth/server.mts
+ * Never imported by application code. Run with: node tests/e2e/mock-supabase/server.mts
  */
 import { randomUUID } from "node:crypto";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+
+import { createTestDatabase } from "../../support/supabase/database.mts";
+import { createSupabaseEmulator } from "../../support/supabase/emulator.mts";
 
 const port = Number(process.env.MOCK_AUTH_PORT ?? 54329);
 /** When "true", signups must confirm their email (no session is returned). */
@@ -31,6 +36,21 @@ interface MockSession {
 const users = new Map<string, MockUser>();
 const sessions = new Map<string, MockSession>();
 const refreshTokens = new Map<string, string>();
+
+const database = await createTestDatabase();
+const emulator = createSupabaseEmulator(database, (token) => {
+  if (!token || token === process.env.MOCK_SUPABASE_PUBLISHABLE_KEY) return { role: "anon" };
+  const session = sessions.get(token);
+  if (!session || session.expiresAt * 1000 < Date.now()) return "invalid";
+  const user = findUserById(session.userId);
+  return user ? { role: "authenticated", sub: user.id, email: user.email } : "invalid";
+});
+
+/** Every auth user also exists in the database, as on Supabase. */
+async function addUser(user: MockUser) {
+  users.set(user.email, user);
+  await database.createUser(user.id, user.email);
+}
 
 function base64url(value: string): string {
   return Buffer.from(value).toString("base64url");
@@ -113,9 +133,41 @@ function findUserById(id: string): MockUser | undefined {
   return [...users.values()].find((user) => user.id === id);
 }
 
+/** Answers Data API and Storage requests through the emulator; false for other paths. */
+async function handleData(req: IncomingMessage, res: ServerResponse, url: URL): Promise<boolean> {
+  if (!url.pathname.startsWith("/rest/v1/") && !url.pathname.startsWith("/storage/v1/")) {
+    return false;
+  }
+  const chunks: Buffer[] = [];
+  for await (const chunk of req) chunks.push(chunk as Buffer);
+  const headers = new Headers();
+  for (const [name, value] of Object.entries(req.headers)) {
+    if (typeof value === "string") headers.set(name, value);
+    else if (Array.isArray(value)) headers.set(name, value.join(", "));
+  }
+  const method = req.method ?? "GET";
+  const request = new Request(url, {
+    method,
+    headers,
+    body: method === "GET" || method === "HEAD" ? undefined : Buffer.concat(chunks),
+  });
+  const response = (await emulator.handle(request)) ?? new Response(null, { status: 404 });
+  const body = Buffer.from(await response.arrayBuffer());
+  res.writeHead(response.status, Object.fromEntries(response.headers.entries()));
+  res.end(body);
+  return true;
+}
+
 const server = createServer(async (req, res) => {
   const url = new URL(req.url ?? "/", `http://127.0.0.1:${port}`);
   const path = url.pathname;
+
+  try {
+    if (await handleData(req, res, url)) return;
+  } catch (error) {
+    process.stderr.write(`[mock-supabase] data request failed: ${String(error)}\n`);
+    return fail(res, 500, "internal", "Mock data request failed");
+  }
 
   if (req.method === "GET" && path === "/health") return send(res, 200, { ok: true });
 
@@ -124,6 +176,8 @@ const server = createServer(async (req, res) => {
     users.clear();
     sessions.clear();
     refreshTokens.clear();
+    await database.reset();
+    emulator.objects.clear();
     return send(res, 204);
   }
   if (req.method === "POST" && path === "/__test/expire-sessions") {
@@ -140,7 +194,7 @@ const server = createServer(async (req, res) => {
       name: String(body.name ?? ""),
       createdAt: new Date().toISOString(),
     };
-    users.set(user.email, user);
+    await addUser(user);
     return send(res, 201, { id: user.id });
   }
 
@@ -171,7 +225,7 @@ const server = createServer(async (req, res) => {
       name: data.full_name ?? "",
       createdAt: new Date().toISOString(),
     };
-    users.set(email, user);
+    await addUser(user);
     return requireConfirmation
       ? send(res, 200, userJson(user))
       : send(res, 200, issueSession(user));
@@ -226,6 +280,6 @@ const server = createServer(async (req, res) => {
 
 server.listen(port, "127.0.0.1", () => {
   process.stdout.write(
-    `[mock-auth] listening on http://127.0.0.1:${port} (confirmation ${requireConfirmation ? "on" : "off"})\n`,
+    `[mock-supabase] listening on http://127.0.0.1:${port} (confirmation ${requireConfirmation ? "on" : "off"})\n`,
   );
 });

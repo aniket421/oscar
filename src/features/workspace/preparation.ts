@@ -29,7 +29,8 @@ export function derivePreparationSteps(snapshot: WorkspaceSnapshot): Preparation
       description: "So questions reflect your real experience.",
       href: "/resume",
       capability: "resume",
-      state: snapshot.resume?.status === "ready" ? "complete" : "not_started",
+      // A resume counts once it is stored and not rejected by processing.
+      state: snapshot.resume && snapshot.resume.status !== "failed" ? "complete" : "not_started",
     },
     {
       id: "interview",

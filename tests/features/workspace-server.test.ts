@@ -3,7 +3,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const requireUser = vi.fn();
-vi.mock("@/features/auth/server", () => ({ requireUser }));
+const getCurrentUser = vi.fn();
+vi.mock("@/features/auth/server", () => ({ requireUser, getCurrentUser }));
+// No Supabase project in unit tests: the workspace falls back to its empty data source.
+vi.mock("@/server/supabase/server-client", () => ({
+  createSupabaseServerClient: async () => null,
+}));
 
 const { getWorkspaceSnapshot } = await import("@/features/workspace/server");
 
