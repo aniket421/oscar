@@ -5,15 +5,18 @@ for tables, constraints, Row Level Security policies, and storage buckets.
 
 | Migration                               | Contents                                                               |
 | --------------------------------------- | ---------------------------------------------------------------------- |
-| `20261006000100_candidate_profile.sql`  | Helpers, profiles, preferences, education, experience, projects, certs |
-| `20261006000200_resumes_and_skills.sql` | Resumes, parse results, the analysis foundation, skills                |
-| `20261006000300_candidate_storage.sql`  | Private `resumes` and `avatars` buckets and their storage policies     |
+| `20261007081208_candidate_profile.sql`  | Helpers, profiles, preferences, education, experience, projects, certs |
+| `20261007081243_resumes_and_skills.sql` | Resumes, parse results, the analysis foundation, skills                |
+| `20261007081316_candidate_storage.sql`  | Private `resumes` and `avatars` buckets and their storage policies     |
 
 ## Applying them
 
 With the Supabase CLI: `supabase link --project-ref <ref>` once, then `supabase db push`.
 Without it: run each file in order in the project's SQL editor. Both create the storage
 buckets, so nothing needs to be set up by hand in the dashboard.
+
+The file versions match the project's migration history (these were applied on 2026-10-07, which
+recorded them under these timestamps), so `supabase db push` treats them as already applied.
 
 ## Checking a project
 
@@ -23,6 +26,13 @@ right command, role, and ownership check, no extra policies, no `anon` access, p
 with their size and type limits, and the helper functions, triggers, and index. Every row should
 show `ok = true`; a failing row names exactly what is missing or different. It changes nothing, so
 it is safe to run at any time. `tests/db/verify-sql.test.ts` keeps it in step with the migrations.
+
+[`isolation-delete-check.sql`](isolation-delete-check.sql) covers the checks that need `DELETE`
+statements: another user cannot delete a user's rows or files, deleting a resume removes its
+parse and analysis, and deleting an account removes every candidate row. It creates two
+throwaway users and always ends with an error that lists the results, so every change is rolled
+back and nothing remains. Every result should start with `PASS` (`INFO` lines are notes).
+`tests/db/isolation-delete-check.test.ts` keeps it honest.
 
 ## Rules
 
