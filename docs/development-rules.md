@@ -56,9 +56,10 @@ These rules apply to every change in Oscar 2.0, by humans and AI agents alike.
 21. Every protected page, Server Action, and Route Handler verifies the user itself through
     `@/features/auth/server` (`requireUser`/`getCurrentUser`). The proxy is a first line of
     defense, not the authorization check.
-22. Never create a Supabase client in the browser, never expose Supabase keys through
-    `NEXT_PUBLIC_*`, and never use the service-role key in this app without an explicit design
-    review.
+22. Never create a Supabase client in the browser. Supabase settings (`NEXT_PUBLIC_SUPABASE_URL`,
+    `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`) are read only in `server/supabase/config.ts`, by name,
+    never through a static `process.env.NEXT_PUBLIC_*` reference or in a client component. Never
+    use the secret or service-role key in this app without an explicit design review.
 23. Show users the messages from `describeAuthError()`, never raw provider errors. Log only error
     name, status, and code.
 24. Accept redirect targets only through `safeRedirectPath()`.

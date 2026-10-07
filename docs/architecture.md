@@ -107,15 +107,23 @@ names or branding appear in user-facing code.
 
 All variables are listed in `.env.example` with empty placeholders.
 
-| Variable                   | Exposure                   | Purpose                                                             |
-| -------------------------- | -------------------------- | ------------------------------------------------------------------- |
-| `NEXT_PUBLIC_APP_URL`      | Public                     | Absolute URLs for metadata and the email confirmation link          |
-| `SUPABASE_URL`             | Server only                | Supabase project URL                                                |
-| `SUPABASE_PUBLISHABLE_KEY` | Server only                | Publishable (or legacy anon) key. Never the secret/service-role key |
-| `CONTACT_EMAIL`            | Server only, read at build | Public contact address on /contact and in legal pages               |
+| Variable                               | Exposure                   | Purpose                                                                   |
+| -------------------------------------- | -------------------------- | ------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_APP_URL`                  | Public                     | Absolute URLs for metadata and the email confirmation link                |
+| `NEXT_PUBLIC_SUPABASE_URL`             | Read on the server only    | Supabase project URL (older name: `SUPABASE_URL`)                         |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Read on the server only    | Publishable (or legacy anon) key (older name: `SUPABASE_PUBLISHABLE_KEY`) |
+| `SUPABASE_SECRET_KEY`                  | Never read by the app      | Operator tooling only; bypasses RLS, so the application must not use it   |
+| `CONTACT_EMAIL`                        | Server only, read at build | Public contact address on /contact and in legal pages                     |
 
-- Supabase values are deliberately **not** `NEXT_PUBLIC_`: Oscar never creates a Supabase client in
-  the browser, so the browser never receives the project URL or key.
+- The Supabase names follow Supabase's `NEXT_PUBLIC_*` convention, but Oscar never creates a
+  Supabase client in the browser and reads them by name at run time in `server/supabase/config.ts`
+  (a static `process.env.NEXT_PUBLIC_*` reference would be inlined into a bundle). Tests fail if a
+  client component mentions them, if any code inlines them, or if application code reads
+  `SUPABASE_SECRET_KEY`.
+- The app refuses a secret key or service-role JWT in the publishable slot (fail closed), since it
+  would bypass Row Level Security for every request.
+- Test isolation: Vitest blanks every Supabase variable, and `playwright.config.ts` pins the app
+  under test to the mock (explicit values beat `.env.local`; the secret key is blanked).
 - `src/lib/env.ts` provides `readEnv` / `requireEnv`. Missing auth config is detected at runtime;
   the app then reports "sign-in temporarily unavailable" (production) or shows a setup notice
   (development) instead of crashing.

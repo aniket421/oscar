@@ -23,8 +23,8 @@ afterEach(() => {
 });
 
 function configure() {
-  vi.stubEnv("SUPABASE_URL", "http://127.0.0.1:54329");
-  vi.stubEnv("SUPABASE_PUBLISHABLE_KEY", "test-key-not-a-secret");
+  vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "http://127.0.0.1:54329");
+  vi.stubEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "test-key-not-a-secret");
 }
 
 function request(path: string, cookie?: string) {

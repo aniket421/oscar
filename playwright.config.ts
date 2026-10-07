@@ -10,9 +10,20 @@ const APP_PORT = 3100;
 const MOCK_AUTH_PORT = 54329;
 export const MOCK_AUTH_URL = `http://127.0.0.1:${MOCK_AUTH_PORT}`;
 
+const MOCK_PUBLISHABLE_KEY = "e2e-test-key-not-a-secret";
+
+/**
+ * The app under test always talks to the mock. Values set here take precedence over `.env.local`
+ * (Next.js never overrides a variable already in the environment, even an empty one), so a real
+ * project configured for development can never be reached from the end-to-end suite, and a real
+ * secret key never reaches the test server.
+ */
 const appEnv = {
+  NEXT_PUBLIC_SUPABASE_URL: MOCK_AUTH_URL,
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: MOCK_PUBLISHABLE_KEY,
   SUPABASE_URL: MOCK_AUTH_URL,
-  SUPABASE_PUBLISHABLE_KEY: "e2e-test-key-not-a-secret",
+  SUPABASE_PUBLISHABLE_KEY: MOCK_PUBLISHABLE_KEY,
+  SUPABASE_SECRET_KEY: "",
   NEXT_PUBLIC_APP_URL: `http://localhost:${APP_PORT}`,
 };
 
@@ -50,7 +61,7 @@ export default defineConfig({
       env: {
         MOCK_AUTH_PORT: String(MOCK_AUTH_PORT),
         // Requests carrying only this key run as the anonymous role.
-        MOCK_SUPABASE_PUBLISHABLE_KEY: appEnv.SUPABASE_PUBLISHABLE_KEY,
+        MOCK_SUPABASE_PUBLISHABLE_KEY: MOCK_PUBLISHABLE_KEY,
       },
       reuseExistingServer: false,
     },

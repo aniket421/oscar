@@ -44,9 +44,13 @@ npm run dev                   # http://localhost:3000
 ### Configure authentication
 
 1. Create a Supabase project.
-2. In **Project Settings > API**, copy the project URL and the **publishable** key (or the legacy
-   anon key) into `.env.local` as `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`. Never use the
-   secret or service-role key.
+2. In **Project Settings > API Keys**, copy the project URL and the **publishable** key (or the
+   legacy anon key) into `.env.local` as `NEXT_PUBLIC_SUPABASE_URL` and
+   `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (the older names `SUPABASE_URL` and
+   `SUPABASE_PUBLISHABLE_KEY` still work). Oscar reads them on the server only. Never put the
+   secret key there: the app refuses to start Supabase with a secret or service-role key. The
+   application does not use `SUPABASE_SECRET_KEY`; keep it out of the app's environment unless an
+   operator tool needs it.
 3. In **Authentication > URL Configuration**, set the Site URL to your `NEXT_PUBLIC_APP_URL` and
    add `<NEXT_PUBLIC_APP_URL>/auth/confirm` to the Redirect URLs.
 4. Apply the database migrations in `supabase/migrations/` (see
@@ -151,8 +155,13 @@ occasionally get out of sync (the browser console shows `HMR hash mismatch` on a
 It only affects `npm run dev`, never production. Stop the dev server, run `npm run clean`, and
 start it again.
 
-**"Authentication is not configured" on /login.** Set `SUPABASE_URL` and
-`SUPABASE_PUBLISHABLE_KEY` in `.env.local` and restart the dev server.
+**"Authentication is not configured" on /login.** Set `NEXT_PUBLIC_SUPABASE_URL` and
+`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in `.env.local` and restart the dev server. If the server
+log says the publishable key is a secret or service-role key, replace it with the publishable key.
+
+**Tests and the real project.** Unit and integration tests blank every Supabase variable, and the
+end-to-end suite pins the app to the local mock (`playwright.config.ts`), so a real project
+configured for development is never reached by the test suites.
 
 **The profile or resume page shows "Something went wrong".** The database migrations have probably
 not been applied to the Supabase project. Apply `supabase/migrations/` (see above).

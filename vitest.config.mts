@@ -16,5 +16,14 @@ export default defineConfig({
     include: ["tests/**/*.test.{ts,tsx}", "src/**/*.test.{ts,tsx}"],
     exclude: ["tests/e2e/**", "node_modules/**"],
     css: { modules: { classNameStrategy: "non-scoped" } },
+    // Tests never reach a real Supabase project: any project settings in the shell are blanked,
+    // and tests that need values stub them explicitly.
+    env: {
+      NEXT_PUBLIC_SUPABASE_URL: "",
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "",
+      SUPABASE_URL: "",
+      SUPABASE_PUBLISHABLE_KEY: "",
+      SUPABASE_SECRET_KEY: "",
+    },
   },
 });

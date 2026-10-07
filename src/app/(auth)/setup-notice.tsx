@@ -9,8 +9,8 @@ export function SetupNotice() {
   if (process.env.NODE_ENV === "production" || getSupabaseConfig()) return null;
   return (
     <Alert tone="warning" title="Authentication is not configured">
-      Set SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY in .env.local, then restart the dev server. See
-      the README for details.
+      Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY in .env.local, then
+      restart the dev server. See the README for details.
     </Alert>
   );
 }
