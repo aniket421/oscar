@@ -44,7 +44,7 @@ async function runCheck(change = ""): Promise<{ summary: string; lines: string[]
 describe("supabase/isolation-delete-check.sql", () => {
   it("passes every check once all migrations are applied", async () => {
     const { summary, lines } = await runCheck();
-    expect(summary).toBe("QA_RESULT delete-checks passed=14 failed=0 (rolled back)");
+    expect(summary).toBe("QA_RESULT delete-checks passed=19 failed=0 (rolled back)");
     expect(lines.filter((line) => !/^(PASS|INFO) /.test(line))).toEqual([]);
   });
 
@@ -61,7 +61,7 @@ describe("supabase/isolation-delete-check.sql", () => {
     [
       "a delete policy wider than the read policy",
       "create policy anyone_deletes on public.profiles for delete to authenticated using (true);",
-      "FAIL B's unfiltered delete reaches only B's own profile (2 rows)",
+      "FAIL A's unfiltered delete reaches only A's own profile (2 rows)",
     ],
     [
       "a file delete policy that ignores the owner's folder",

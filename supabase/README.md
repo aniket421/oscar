@@ -3,11 +3,12 @@
 Database schema for Oscar, as Supabase migrations. These files are the single source of truth
 for tables, constraints, Row Level Security policies, and storage buckets.
 
-| Migration                               | Contents                                                               |
-| --------------------------------------- | ---------------------------------------------------------------------- |
-| `20261007081208_candidate_profile.sql`  | Helpers, profiles, preferences, education, experience, projects, certs |
-| `20261007081243_resumes_and_skills.sql` | Resumes, parse results, the analysis foundation, skills                |
-| `20261007081316_candidate_storage.sql`  | Private `resumes` and `avatars` buckets and their storage policies     |
+| Migration                                     | Contents                                                               |
+| --------------------------------------------- | ---------------------------------------------------------------------- |
+| `20261007081208_candidate_profile.sql`        | Helpers, profiles, preferences, education, experience, projects, certs |
+| `20261007081243_resumes_and_skills.sql`       | Resumes, parse results, the analysis foundation, skills                |
+| `20261007081316_candidate_storage.sql`        | Private `resumes` and `avatars` buckets and their storage policies     |
+| `20261007162349_restrict_rls_auto_enable.sql` | Stops API roles calling Supabase's automatic-RLS event-trigger helper  |
 
 ## Applying them
 

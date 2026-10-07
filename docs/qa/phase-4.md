@@ -151,6 +151,28 @@ resume, file, or photo, and A's data is intact afterwards (E2E).
 - [x] Motion limited to the progress indicators
 - [x] No em dashes in product copy (guard test)
 
+## Real Supabase project (2026-10-07)
+
+Run through the Supabase connector. Every test ran inside a transaction that ends in an error, so
+it was rolled back and nothing remained (0 users, 0 rows, 0 files afterwards).
+
+- [x] Migrations applied once, to an empty project; the migration files carry the versions the
+      project recorded
+- [x] `supabase/verify.sql`: 86 of 86 checks pass (tables, RLS, policies, privileges, private
+      buckets, functions, triggers, index); columns, check constraints, foreign keys, and indexes
+      match the migrations
+- [x] Isolation without deletes, 69 checks: own-profile access, other users' profiles unreadable
+      and unmodifiable, own resume records, other users' resume records unreadable and
+      unmodifiable, own storage paths only, other users' files unreadable and unmodifiable,
+      anonymous access refused, no attaching records to another user's resume
+- [x] Security advisor clean: `public.rls_auto_enable()` (Supabase's automatic-RLS helper) no
+      longer executable by API roles; automatic RLS on new tables still works (probe)
+- [ ] `supabase/isolation-delete-check.sql` (delete paths and account deletion) in the SQL editor;
+      the connector holds DELETE statements for a confirmation it cannot show
+- [ ] Sign-up, sign-in, session, dashboard, profile, resume, sign-out, and the protected-route
+      redirect through the app against the real project; needs a session that can reach it
+- [ ] Performance advisor: index for `skills.resume_id` (separate improvement)
+
 ## Out of scope (confirmed not built)
 
 - [x] Interview question generation, interview state machine, voice/video interview, AI

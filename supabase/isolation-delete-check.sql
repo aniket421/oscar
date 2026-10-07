@@ -12,7 +12,9 @@ declare
   a uuid := gen_random_uuid();
   b uuid := gen_random_uuid();
   ra uuid := gen_random_uuid();
+  rb uuid := gen_random_uuid();
   a_file text;
+  b_file text;
   r text[] := '{}';
   n bigint;
   m bigint;
@@ -22,7 +24,7 @@ begin
     (a, 'oscar-qa-' || a || '@example.invalid'),
     (b, 'oscar-qa-' || b || '@example.invalid');
 
-  -- User A's data in every table, and one stored file. User B has a profile and an education row.
+  -- User A's data in every table, and one stored file. User B starts with a profile and education.
   a_file := 'user/' || a || '/resume/' || ra || '/original.pdf';
   insert into public.profiles (user_id, full_name) values (a, 'QA A');
   insert into public.candidate_preferences (user_id, target_role) values (a, 'QA role');
@@ -88,19 +90,26 @@ begin
   get diagnostics n = row_count;
   r := array_append(r, case when n = 1 then 'PASS' else 'FAIL' end
     || ' B''s unfiltered update reaches only B''s own profile (' || n || ' rows)');
-  delete from public.profiles;
+  delete from public.education;
   get diagnostics n = row_count;
   r := array_append(r, case when n = 1 then 'PASS' else 'FAIL' end
-    || ' B''s unfiltered delete reaches only B''s own profile (' || n || ' rows)');
+    || ' B''s unfiltered delete reaches only B''s own education (' || n || ' rows)');
 
   execute 'reset role';
   select count(*) into n from public.profiles where user_id = a and headline is null;
+  select n + count(*) into n from public.education where user_id = a;
   select n + count(*) into n from public.resumes where id = ra;
   select n + count(*) into n from public.resume_parses where resume_id = ra;
   select n + count(*) into n from public.resume_analyses where resume_id = ra;
   select n + count(*) into n from storage.objects where name = a_file;
-  r := array_append(r, case when n = 5 then 'PASS' else 'FAIL' end
-    || ' A''s profile, resume, parse, analysis, and file intact (' || n || '/5)');
+  r := array_append(r, case when n = 6 then 'PASS' else 'FAIL' end
+    || ' A''s profile, education, resume, parse, analysis, and file intact (' || n || '/6)');
+
+  -- User B now gets a resume and a stored file too.
+  b_file := 'user/' || b || '/resume/' || rb || '/original.pdf';
+  insert into public.resumes (id, user_id, file_name, storage_path, file_type, file_size)
+    values (rb, b, 'b.pdf', b_file, 'pdf', 2048);
+  insert into storage.objects (bucket_id, name) values ('resumes', b_file);
 
   -- User A deletes own resume record: its parse and analysis go with it, the skill stays unlinked.
   perform set_config('request.jwt.claims', json_build_object('sub', a, 'role', 'authenticated')::text, true);
@@ -119,6 +128,35 @@ begin
   r := array_append(r, case when n = 1 then 'PASS' else 'FAIL' end
     || ' deleting a resume keeps the skill, unlinked (' || n || ')');
 
+  -- User A tries to delete B's data.
+  execute 'set local role authenticated';
+  delete from public.profiles where user_id = b;
+  get diagnostics n = row_count;
+  r := array_append(r, case when n = 0 then 'PASS' else 'FAIL' end
+    || ' A cannot delete B''s profile (' || n || ' rows)');
+  delete from public.resumes where id = rb;
+  get diagnostics n = row_count;
+  r := array_append(r, case when n = 0 then 'PASS' else 'FAIL' end
+    || ' A cannot delete B''s resume record (' || n || ' rows)');
+  begin
+    delete from storage.objects where name = b_file;
+    get diagnostics n = row_count;
+    r := array_append(r, case when n = 0 then 'PASS' else 'FAIL' end
+      || ' A cannot delete B''s file (' || n || ' rows)');
+  exception when others then
+    r := array_append(r, 'PASS A cannot delete B''s file (refused: ' || sqlstate || ')');
+  end;
+  delete from public.profiles;
+  get diagnostics n = row_count;
+  r := array_append(r, case when n = 1 then 'PASS' else 'FAIL' end
+    || ' A''s unfiltered delete reaches only A''s own profile (' || n || ' rows)');
+  execute 'reset role';
+  select count(*) into n from public.profiles where user_id = b;
+  select n + count(*) into n from public.resumes where id = rb;
+  select n + count(*) into n from storage.objects where name = b_file;
+  r := array_append(r, case when n = 3 then 'PASS' else 'FAIL' end
+    || ' B''s profile, resume, and file intact (' || n || '/3)');
+
   -- Deleting A's account removes every candidate row, and nothing of B's.
   begin
     delete from auth.users where id = a;
@@ -133,9 +171,10 @@ begin
   exception when others then
     r := array_append(r, 'FAIL account deletion: ' || sqlstate || ' ' || sqlerrm);
   end;
-  select count(*) into n from public.education where user_id = b;
-  r := array_append(r, case when n = 1 then 'PASS' else 'FAIL' end
-    || ' another account''s data is untouched (' || n || ')');
+  select count(*) into n from public.profiles where user_id = b;
+  select n + count(*) into n from public.resumes where id = rb;
+  r := array_append(r, case when n = 2 then 'PASS' else 'FAIL' end
+    || ' another account''s rows are untouched by the deletion (' || n || '/2)');
   select count(*) into n from storage.objects where name like 'user/' || a || '/%';
   r := array_append(r, 'INFO stored files are removed by the app through the Storage API, not by'
     || ' account deletion (' || n || ' left here)');
