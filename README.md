@@ -56,7 +56,8 @@ npm run dev                   # http://localhost:3000
 4. Apply the database migrations in `supabase/migrations/` (see
    [`supabase/README.md`](supabase/README.md)): `supabase link` then `supabase db push`, or run
    each file in order in the SQL editor. They create the tables, Row Level Security policies, and
-   the private `resumes` and `avatars` storage buckets.
+   the private `resumes` and `avatars` storage buckets. Then run `supabase/verify.sql` in the SQL
+   editor: it only reads, and every row should show `ok = true`.
 5. Restart the dev server.
 
 Without these values the site still runs: marketing pages work, the auth pages show a setup notice
@@ -146,7 +147,9 @@ authentication design.
 
 All variables are documented in [`.env.example`](.env.example), which contains placeholders only.
 Real values belong in `.env.local` (git-ignored) or the deployment platform's secret store.
-Supabase values are server-only by design; do not rename them to `NEXT_PUBLIC_*`.
+The Supabase URL and publishable key use `NEXT_PUBLIC_*` names but are read on the server only;
+Oscar never creates a Supabase client in the browser. `SUPABASE_SECRET_KEY` is not used by the app:
+never give it a `NEXT_PUBLIC_` name, never commit it, and rotate it if it is ever exposed.
 
 ## Troubleshooting
 
@@ -156,8 +159,14 @@ It only affects `npm run dev`, never production. Stop the dev server, run `npm r
 start it again.
 
 **"Authentication is not configured" on /login.** Set `NEXT_PUBLIC_SUPABASE_URL` and
-`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in `.env.local` and restart the dev server. If the server
-log says the publishable key is a secret or service-role key, replace it with the publishable key.
+`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in `.env.local` and restart the dev server. The notice and
+the server log name the variable to fix (never its value): the URL must start with `https://`
+(or `http://` for a local stack).
+
+**"Authentication is turned off" on /login.** The publishable-key variable holds a secret,
+service-role, or user key. Oscar refuses all three: secret and service-role keys bypass Row Level
+Security, and a user's token is not a project key. Replace it with the project's publishable key
+and restart the dev server.
 
 **Tests and the real project.** Unit and integration tests blank every Supabase variable, and the
 end-to-end suite pins the app to the local mock (`playwright.config.ts`), so a real project

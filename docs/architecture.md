@@ -120,10 +120,16 @@ All variables are listed in `.env.example` with empty placeholders.
   (a static `process.env.NEXT_PUBLIC_*` reference would be inlined into a bundle). Tests fail if a
   client component mentions them, if any code inlines them, or if application code reads
   `SUPABASE_SECRET_KEY`.
-- The app refuses a secret key or service-role JWT in the publishable slot (fail closed), since it
-  would bypass Row Level Security for every request.
-- Test isolation: Vitest blanks every Supabase variable, and `playwright.config.ts` pins the app
-  under test to the mock (explicit values beat `.env.local`; the secret key is blanked).
+- The URL and key are read as a pair (the `NEXT_PUBLIC_*` pair when either is set, otherwise the
+  older pair), so values from two naming schemes are never mixed.
+- The app fails closed: it refuses a secret key, a service-role JWT, or any JWT whose role is not
+  `anon` in the publishable slot (a secret or service-role key would bypass Row Level Security for
+  every request), and a URL without an `http(s)://` scheme. The setup notice and server log name
+  the variable to fix, never its value.
+- Test isolation: Vitest blanks every Supabase variable, and `playwright.config.ts` drops any
+  exported in the shell and pins the app under test to the mock (explicit values beat `.env.local`;
+  the secret key gets a non-empty placeholder so a `${SUPABASE_SECRET_KEY}` reference cannot expand
+  to a real key).
 - `src/lib/env.ts` provides `readEnv` / `requireEnv`. Missing auth config is detected at runtime;
   the app then reports "sign-in temporarily unavailable" (production) or shows a setup notice
   (development) instead of crashing.

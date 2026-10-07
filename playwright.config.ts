@@ -13,17 +13,33 @@ export const MOCK_AUTH_URL = `http://127.0.0.1:${MOCK_AUTH_PORT}`;
 const MOCK_PUBLISHABLE_KEY = "e2e-test-key-not-a-secret";
 
 /**
+ * Supabase settings exported in the shell are dropped before anything starts, so neither the mock
+ * server nor the test workers (which inherit this process's environment) ever see a real
+ * project's values.
+ */
+for (const name of [
+  "NEXT_PUBLIC_SUPABASE_URL",
+  "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+  "SUPABASE_URL",
+  "SUPABASE_PUBLISHABLE_KEY",
+  "SUPABASE_SECRET_KEY",
+]) {
+  delete process.env[name];
+}
+
+/**
  * The app under test always talks to the mock. Values set here take precedence over `.env.local`
- * (Next.js never overrides a variable already in the environment, even an empty one), so a real
- * project configured for development can never be reached from the end-to-end suite, and a real
- * secret key never reaches the test server.
+ * (Next.js never overrides a variable already in the environment), so a real project configured
+ * for development can never be reached from the end-to-end suite. The secret key gets a non-empty
+ * placeholder because an empty value would let a `${SUPABASE_SECRET_KEY}` reference in
+ * `.env.local` expand to the real key.
  */
 const appEnv = {
   NEXT_PUBLIC_SUPABASE_URL: MOCK_AUTH_URL,
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: MOCK_PUBLISHABLE_KEY,
   SUPABASE_URL: MOCK_AUTH_URL,
   SUPABASE_PUBLISHABLE_KEY: MOCK_PUBLISHABLE_KEY,
-  SUPABASE_SECRET_KEY: "",
+  SUPABASE_SECRET_KEY: "e2e-no-secret-key",
   NEXT_PUBLIC_APP_URL: `http://localhost:${APP_PORT}`,
 };
 
