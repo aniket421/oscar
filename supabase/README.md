@@ -29,11 +29,16 @@ show `ok = true`; a failing row names exactly what is missing or different. It c
 it is safe to run at any time. `tests/db/verify-sql.test.ts` keeps it in step with the migrations.
 
 [`isolation-delete-check.sql`](isolation-delete-check.sql) covers the checks that need `DELETE`
-statements: another user cannot delete a user's rows or files, deleting a resume removes its
-parse and analysis, and deleting an account removes every candidate row. It creates two
-throwaway users and always ends with an error that lists the results, so every change is rolled
-back and nothing remains. Every result should start with `PASS` (`INFO` lines are notes).
-`tests/db/isolation-delete-check.test.ts` keeps it honest.
+statements: neither of two users can delete the other's rows or files, an unfiltered delete
+reaches only the caller's own rows (so no delete policy is wider than its read policy), deleting a
+resume removes its parse and analysis, and deleting an account removes its rows from all 10 tables
+while a bystander's data survives. It creates three throwaway users, opts file deletes in the way
+the Storage API does (otherwise Supabase's delete guard refuses them before any policy is
+checked), and always ends with an error that lists the results, so every change is rolled back
+and nothing remains. Every result should start with `PASS` (`INFO` lines are notes).
+`tests/db/isolation-delete-check.test.ts` proves each weakened policy or non-cascading foreign
+key fails a check. Account deletion does not remove stored files; Oscar has no account deletion
+flow yet.
 
 ## Rules
 

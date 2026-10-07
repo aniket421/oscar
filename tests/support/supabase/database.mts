@@ -64,7 +64,7 @@ export async function createTestDatabase(): Promise<TestDatabase> {
       await db.query("insert into auth.users (id, email) values ($1, $2)", [id, email]);
     },
     async reset() {
-      await db.exec("delete from storage.objects; truncate auth.users cascade;");
+      await db.exec("truncate storage.objects; truncate auth.users cascade;");
     },
     async close() {
       await db.close();

@@ -5,7 +5,8 @@
 --   * the API roles (anon, authenticated, service_role) and Supabase's permissive default grants
 --     on the public schema, which is exactly why RLS matters;
 --   * auth.users and auth.uid(), which reads the JWT claims PostgREST sets per request;
---   * storage.buckets, storage.objects (with RLS enabled), and storage.foldername().
+--   * storage.buckets, storage.objects (with RLS enabled), storage.foldername(), and the trigger
+--     that refuses direct deletes unless the request opted in, as the Storage API does.
 
 create role anon nologin noinherit;
 create role authenticated nologin noinherit;
@@ -96,3 +97,21 @@ begin
   return _parts[1:array_length(_parts, 1) - 1];
 end;
 $$;
+
+-- Supabase Storage refuses direct DELETEs on storage.objects unless the request opted in, which the
+-- Storage API does on every request (storage.allow_delete_query = 'true'); the delete policies
+-- then decide. Same function and statement trigger as a real project's protect_objects_delete.
+create function storage.protect_delete() returns trigger
+language plpgsql
+as $$
+begin
+  if coalesce(current_setting('storage.allow_delete_query', true), 'false') != 'true' then
+    raise exception 'Direct deletion from storage tables is not allowed. Use the Storage API instead.'
+      using hint = 'This prevents accidental data loss from orphaned objects.', errcode = '42501';
+  end if;
+  return null;
+end;
+$$;
+
+create trigger protect_objects_delete before delete on storage.objects
+  for each statement execute function storage.protect_delete();

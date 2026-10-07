@@ -50,6 +50,11 @@ function asAnon<T>(work: (tx: Transaction) => Promise<T>): Promise<T> {
   return database.as({ role: "anon" }, work);
 }
 
+/** What the Storage API does on every request; without it Supabase refuses direct file deletes. */
+async function allowStorageDeletes(tx: Transaction) {
+  await tx.query("select set_config('storage.allow_delete_query', 'true', true)");
+}
+
 async function rows(userId: string, sql: string, params: unknown[] = []) {
   return asUser(userId, async (tx) => (await tx.query(sql, params)).rows);
 }
@@ -299,10 +304,10 @@ describe("storage policies", () => {
     await insertObject(userA, "avatars", `user/${userA}/avatar/${resumeA}.png`);
 
     expect(await rows(userB, "select name from storage.objects")).toEqual([]);
-    const deleted = await asUser(
-      userB,
-      async (tx) => (await tx.query("delete from storage.objects")).affectedRows,
-    );
+    const deleted = await asUser(userB, async (tx) => {
+      await allowStorageDeletes(tx);
+      return (await tx.query("delete from storage.objects")).affectedRows;
+    });
     expect(deleted).toBe(0);
     const moved = await asUser(
       userB,
@@ -315,11 +320,19 @@ describe("storage policies", () => {
 
   it("lets the owner remove their own files", async () => {
     await insertObject(userA, "resumes", ownResumePath);
-    const deleted = await asUser(
-      userA,
-      async (tx) => (await tx.query("delete from storage.objects")).affectedRows,
-    );
+    const deleted = await asUser(userA, async (tx) => {
+      await allowStorageDeletes(tx);
+      return (await tx.query("delete from storage.objects")).affectedRows;
+    });
     expect(deleted).toBe(1);
+  });
+
+  it("refuses direct file deletes that bypass the Storage API", async () => {
+    await insertObject(userA, "resumes", ownResumePath);
+    expect(await errorCode(asUser(userA, (tx) => tx.query("delete from storage.objects")))).toBe(
+      "42501",
+    );
+    expect(await rows(userA, "select name from storage.objects")).toHaveLength(1);
   });
 
   it("limits avatars to image names in the user's avatar folder", async () => {

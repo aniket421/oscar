@@ -41,6 +41,10 @@ function failures(checks: Check[]): string[] {
   return checks.filter((check) => !check.ok).map(label);
 }
 
+// Starting a fresh Postgres (WebAssembly) engine takes a few seconds, more on a busy machine, so the
+// tests that build their own database get more than the default five.
+const FRESH_DATABASE_TIMEOUT = 30_000;
+
 /** A database with the platform shim and only the given migrations applied. */
 async function databaseWith(files: string[]): Promise<PGlite> {
   const db = await PGlite.create();
@@ -164,38 +168,46 @@ describe("supabase/verify.sql", () => {
     expect(await failuresAfter(change)).toEqual(expected);
   });
 
-  it("names what is missing when the storage migration was not applied", async () => {
-    const db = await databaseWith(migrationFiles().slice(0, 2));
-    try {
-      expect(failures(await runChecks(db))).toEqual([
-        "policy: storage.objects: avatar_objects_delete_own",
-        "policy: storage.objects: avatar_objects_insert_own",
-        "policy: storage.objects: avatar_objects_select_own",
-        "policy: storage.objects: avatar_objects_update_own",
-        "policy: storage.objects: resume_objects_delete_own",
-        "policy: storage.objects: resume_objects_insert_own",
-        "policy: storage.objects: resume_objects_select_own",
-        "policy: storage.objects: resume_objects_update_own",
-        "storage: bucket avatars",
-        "storage: bucket resumes",
-      ]);
-    } finally {
-      await db.close();
-    }
-  });
+  it(
+    "names what is missing when the storage migration was not applied",
+    async () => {
+      const db = await databaseWith(migrationFiles().slice(0, 2));
+      try {
+        expect(failures(await runChecks(db))).toEqual([
+          "policy: storage.objects: avatar_objects_delete_own",
+          "policy: storage.objects: avatar_objects_insert_own",
+          "policy: storage.objects: avatar_objects_select_own",
+          "policy: storage.objects: avatar_objects_update_own",
+          "policy: storage.objects: resume_objects_delete_own",
+          "policy: storage.objects: resume_objects_insert_own",
+          "policy: storage.objects: resume_objects_select_own",
+          "policy: storage.objects: resume_objects_update_own",
+          "storage: bucket avatars",
+          "storage: bucket resumes",
+        ]);
+      } finally {
+        await db.close();
+      }
+    },
+    FRESH_DATABASE_TIMEOUT,
+  );
 
-  it("reports, rather than errors, on a project with no migrations", async () => {
-    const db = await databaseWith([]);
-    try {
-      const checks = await runChecks(db);
-      expect(checks).toHaveLength(86);
-      expect(checks.filter((check) => check.ok).map(label)).toEqual([
-        "policy: no other policies on Oscar tables",
-        "policy: no other policies on storage.objects",
-        "rls: storage.objects",
-      ]);
-    } finally {
-      await db.close();
-    }
-  });
+  it(
+    "reports, rather than errors, on a project with no migrations",
+    async () => {
+      const db = await databaseWith([]);
+      try {
+        const checks = await runChecks(db);
+        expect(checks).toHaveLength(86);
+        expect(checks.filter((check) => check.ok).map(label)).toEqual([
+          "policy: no other policies on Oscar tables",
+          "policy: no other policies on storage.objects",
+          "rls: storage.objects",
+        ]);
+      } finally {
+        await db.close();
+      }
+    },
+    FRESH_DATABASE_TIMEOUT,
+  );
 });

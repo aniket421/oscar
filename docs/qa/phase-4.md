@@ -68,11 +68,13 @@ voice/video, AI interviewer, scoring, realtime, code execution, MCQ engine, or l
 | `npm run typecheck`            | Pass                                                                         |
 | `npm run lint` (zero warnings) | Pass                                                                         |
 | `npm run format:check`         | Pass                                                                         |
-| `npm run test`                 | Pass: 28 files, 448 tests                                                    |
+| `npm run test`                 | Pass: 32 files, 503 tests (latest run, 2026-10-07)                           |
 | `npm run build`                | Pass                                                                         |
 | `npm run test:e2e`             | Pass: 67 passed, 3 skipped by design (layout-specific tests in each project) |
 
-Phase 4 test files: `tests/db/rls.test.ts` (80, RLS and constraints on Postgres),
+Phase 4 test files: `tests/db/rls.test.ts` (81, RLS and constraints on Postgres),
+`tests/db/verify-sql.test.ts` (17) and `tests/db/isolation-delete-check.test.ts` (9, the
+real-project check scripts),
 `tests/server/candidate-repositories.test.ts` (14, integration through the Supabase client),
 `tests/server/candidate-routes.test.ts` (17, Server Actions and file handlers),
 `tests/features/candidate-logic.test.ts` (26), `tests/features/resume-parsing.test.ts` (15),
@@ -87,7 +89,10 @@ Required coverage:
 - [x] RLS: user A cannot read or modify user B's rows or files; unauthenticated access denied
 - [x] Completeness: computed from real data, changes with the data, never hardcoded
 
-## Browser QA (Playwright, Chromium, production build)
+## Browser QA (Playwright, Chromium, production build, local mock Supabase)
+
+These ran against the local mock (`tests/e2e/mock-supabase`), not the real project. The same
+flows against the real project are listed under "Real Supabase project" below.
 
 1. [x] Login
 2. [x] Open profile
@@ -153,22 +158,27 @@ resume, file, or photo, and A's data is intact afterwards (E2E).
 
 ## Real Supabase project (2026-10-07)
 
-Run through the Supabase connector. Every test ran inside a transaction that ends in an error, so
-it was rolled back and nothing remained (0 users, 0 rows, 0 files afterwards).
+Run through the Supabase connector. The migrations (including the advisor fix) are permanent;
+every isolation test and probe ran inside a transaction that ends in an error, so it was rolled
+back (0 users, 0 rows, 0 files afterwards).
 
 - [x] Migrations applied once, to an empty project; the migration files carry the versions the
       project recorded
 - [x] `supabase/verify.sql`: 86 of 86 checks pass (tables, RLS, policies, privileges, private
-      buckets, functions, triggers, index); columns, check constraints, foreign keys, and indexes
-      match the migrations
+      buckets, functions, triggers, index)
+- [x] A separate read-only catalog query: columns (106), check constraints (70), foreign keys
+      with their delete rules (13), and indexes (20) match the migrations
 - [x] Isolation without deletes, 69 checks: own-profile access, other users' profiles unreadable
       and unmodifiable, own resume records, other users' resume records unreadable and
       unmodifiable, own storage paths only, other users' files unreadable and unmodifiable,
       anonymous access refused, no attaching records to another user's resume
 - [x] Security advisor clean: `public.rls_auto_enable()` (Supabase's automatic-RLS helper) no
-      longer executable by API roles; automatic RLS on new tables still works (probe)
-- [ ] `supabase/isolation-delete-check.sql` (delete paths and account deletion) in the SQL editor;
-      the connector holds DELETE statements for a confirmation it cannot show
+      longer executable by API roles; automatic RLS on new tables still works (probe). Defense in
+      depth: the function was never directly callable, being an event-trigger function
+- [ ] `supabase/isolation-delete-check.sql` (delete paths both ways, delete-policy scope,
+      account deletion across all 10 tables) in the SQL editor; the connector holds DELETE
+      statements for a confirmation it cannot show. Use the current version: an earlier one did
+      not opt file deletes in and would have passed them without checking the policies
 - [ ] Sign-up, sign-in, session, dashboard, profile, resume, sign-out, and the protected-route
       redirect through the app against the real project; needs a session that can reach it
 - [ ] Performance advisor: index for `skills.resume_id` (separate improvement)

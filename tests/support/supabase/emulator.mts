@@ -379,6 +379,8 @@ async function handleStorage(
     const names = body.prefixes ?? [];
     if (names.length === 0) return json([]);
     const deleted = await database.as(claims, async (tx) => {
+      // The Storage API opts every request in to deletes; the delete policies then decide.
+      await tx.query("select set_config('storage.allow_delete_query', 'true', true)");
       const placeholders = names.map((_, index) => `$${index + 2}`).join(", ");
       const result = await tx.query<{ name: string; id: string }>(
         `delete from storage.objects where bucket_id = $1 and name in (${placeholders}) returning name, id`,
