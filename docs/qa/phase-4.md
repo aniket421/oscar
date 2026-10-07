@@ -182,6 +182,8 @@ back (0 users, 0 rows, 0 files afterwards).
 - [ ] Sign-up, sign-in, session, dashboard, profile, resume, sign-out, and the protected-route
       redirect through the app against the real project; needs a session that can reach it
 - [ ] Performance advisor: index for `skills.resume_id` (separate improvement)
+- [ ] Account deletion through the app: not built; a pre-launch requirement, together with
+      removing the user's stored files (see `docs/architecture.md`, "Pre-launch requirements")
 
 ## Out of scope (confirmed not built)
 

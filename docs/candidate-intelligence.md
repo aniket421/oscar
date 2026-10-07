@@ -257,7 +257,7 @@ results are explained to the candidate.
   authenticated handlers with `no-store` caching.
 - Deletion: deleting a resume removes the file and its metadata and parse results. Profile entries
   can be deleted individually. Account deletion (all rows cascade, storage objects removed by the
-  deletion flow) is a deferred decision and not built yet.
+  deletion flow) is not built yet and is a pre-launch requirement (`docs/architecture.md`).
 
 ## 11. Code map
 

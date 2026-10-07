@@ -310,11 +310,22 @@ repositories (server/candidate) ──▶ Supabase Data API + Storage with the u
 ## 11. Deferred decisions
 
 Hosting/deployment target, CI provider, a nonce-based Content Security Policy, password reset,
-OAuth providers, account deletion (including removal of storage objects; rows already cascade),
-notifications, automated accessibility checks in CI (axe), final logo and brand assets, logging
+OAuth providers, notifications, automated accessibility checks in CI (axe), final logo and brand assets, logging
 and error monitoring, i18n, and legal review of the Privacy Policy and Terms (operating entity,
 governing law, minimum age). From Phase 4: a background worker and job queue for resume processing
 (with a service-role design review), the resume analysis provider and its privacy terms,
 model-assisted extraction of work history and education, upload rate limiting, malware scanning
 of uploaded files, and image resizing for profile photos. Each is added when the phase that needs
 it begins, and recorded here.
+
+### Pre-launch requirements
+
+These must exist before real candidates use Oscar.
+
+- **Account deletion flow.** A signed-in candidate can delete their account from Settings. Today
+  the Privacy Policy and Settings send deletion requests to the operator instead.
+- **Stored files removed on account deletion.** Deleting the auth user removes every candidate
+  row (the foreign keys cascade; `supabase/isolation-delete-check.sql` checks it), but it does not
+  remove files: Storage has no cascade. The flow must delete everything under `user/<user id>/` in
+  the `resumes` and `avatars` buckets through the Storage API first, then delete the user. Until
+  the flow exists, an operator handling a deletion request must remove those folders as well.
